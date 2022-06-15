@@ -1,0 +1,867 @@
+---
+title: 'Econometrics Measurements Homework 6 : Paris School of Economics'
+author: "Shreya Ray"
+date: "30/11/2020"
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
+---
+
+#####**Exercise I. Education in France : 10 points**
+
+*The dataset panel97.dta is an excerpt from the 1997 panel of French primary school pupils. It contains 9641 observations, 1 for each pupil. French primary school normally lasts 5 years, from age 6 to age 11. The first to fith grades are called, respectively, “cp”, “ce1”, “ce2”, “cm1” and “cm2” (literally, “preparatory course”, “elementary course 1 ”, “elementary course 2 ”, “intermediate course 1 ” and “intermediate course 2 ”). The sampled pupils were tested at their entry into primary school and were then followed for 5 to 6 years. They were tested again at the beginning of the 3rd grade of primary school, whether they reached that grade in 1999 or in 2000, i.e. whether they did not repeat any grade between the first and the third, or they repeated either the first or the second. Test 2 yielded two separate scores, one measuring numeracy (math) and the other measuring literacy (proficiency in the French language). Finally, pupils were tested again, spearately for math and literacy, soon after the end of primary school, i.e. when they entered middle school (in their “6th grade”). Pupils who did not repeat a grade in primary school were tested in 2002 whereas those who repeated once in primary school were tested in 2003. The variables available in the dataset are detailed in the appendix.*
+
+
+######**Questions**
+**(a) Compare the distributions of raw test scores for each test. Comment. (1 point)**
+The global test score taken at the start of CP (preparatory course) is used as a baseline raw
+test score to measure the relative progress of a student as she goes from CP to CE2
+(elementary course). In order to compare the distributions of all 3 tests, we can analyse the
+graphs of the three global test scores.
+
+```{r, include=FALSE, warning=FALSE}
+
+library(tidyverse)
+library(haven)
+library(knitr)
+library(broom)
+library(ggplot2)
+library(dplyr)
+library(foreign)
+library(kableExtra)
+library(descr)
+library(labeling)
+library(haven)
+
+
+# load the data set 
+df1 <- read_dta("C:/Users/Shreya/Downloads/hw6/panel97.dta")
+View(df1)
+summary(df1) 
+#There are 9641 obs (1 for each pupil) of 28 variables
+
+#1a) Plotting the distributions of global raw scores
+ggplot(df1) +
+ggtitle("Distribution of Global Raw Scores") +
+geom_density(aes(x = gscore_t1, col='a')) +
+geom_density(aes(x = gscore_t2, col='b')) +
+geom_density(aes(x = gscore_t3, col='c')) + 
+scale_colour_manual (name = "", values= c('a' = "indianred", 'b' = "forestgreen", 'c'= "navyblue"), labels= c('Test 1', 'Test 2', 'Test 3')) +
+ylab("Density") + xlab("Global Raw Score") +
+theme(axis.line = element_line(colour = "black"), panel.border= element_blank(), panel.background = element_blank())
+ggsave("Distribution of Global Scores.pdf")
+```
+
+Here we can see that all three of the tests exhibit a skewed distribution, indicating that most of the pupils do better than the average level in all three tests. As we move from Test 1 to Test 2 and finally to Test 3 we can see the distribution curve becoming wider, indicating greater variance in the test scores at higher grade levels. We can also a see the height of the distribution falling from Test 1 to Test 2 and to Test 3. This indicates lesser density around the average test score.Overall, the average scores for all three tests are similar at approximately 75. The variance in the test scores increases but the average performance level remains more or else consistent. 
+
+From a policy standpoint it is important to understand the factors causing this increase in variance of test scores as the children reach high grade levels. The tests could be getting harder, children could be getting lesser individual academic attention as they get older or students could already be developing low self-esteem issues which could be impacting their performance on tests. It is also interesting to note that the NA values rise from merely 110 to 1978 and then 2163 as we move along the three tests. If these NA values are not random but are a result of drop-outs then it is essential to study why children are dropping out of school as the they go to higher grades.
+
+We now zoom in on the Math and French Scores in Test 2 and Test 3. 
+
+```{r, include=FALSE, warning=FALSE}
+# Plotting Test 2 Math and French Scores
+ggplot(df1) +
+ggtitle("Distribution of Test 2 Scores") +
+geom_density(aes(x = mscore_t2, col='a')) +
+geom_density(aes(x = fscore_t2, col='b'))  + 
+scale_colour_manual (name = "", values= c('a' = "indianred", 'b' = "forestgreen", 'c'= "navyblue"), labels= c('Math Score', 'French Score')) + ylab("Density") + xlab("Scores") +
+theme(axis.line = element_line(colour = "black"), panel.border= element_blank(), panel.background = element_blank())
+ggsave("Distribution of Test 2 Scores.pdf")
+
+#Plotting Test 3 Math and French Scores 
+ggplot(df1) +
+ggtitle("Distribution of Test 3 Scores") +
+geom_density(aes(x = mscore_t3, col='a')) +
+geom_density(aes(x = fscore_t3, col='b'))  + 
+scale_colour_manual (name = "", values= c('a' = "indianred", 'b' = "forestgreen", 'c'= "navyblue"), labels= c('Math Score', 'French Score')) + ylab("Density") + xlab("Scores") +
+theme(axis.line = element_line(colour = "black"), panel.border= element_blank(), panel.background = element_blank())
+ggsave("Distribution of Test 3 Scores.pdf")
+
+#Looking at the actual numbers
+summary(df1$gscore_t1)
+summary(df1$gscore_t2)
+summary(df1$gscore_t3)
+```
+
+For Test 2, we can see that there is greater variance in the French scores and a lower average score for the Math scores. The distribution of the French scores is more skewed than the Math scores, indicating that more pupils do well in French than in Math. For Test 3, we can see that the situation has reversed for the variance. There is greater variability in Math scores than the French scores. The greater height and thinner curve of the French distribution indicates that more children attain the average score in French than in Maths. The average score for Math however, is slightly more than the French average score.
+
+Looking at the figures we can see that the median Math score marginally increases from 67.50 to 67.53 as we move from Test 2 to Test 3. More worryingly though, the average score of the weakest quarter of students falls from 56.25 to 52.56 It is also important to note that the median French scores fall from 69.23 to 67.81 and each quartile performs slightly worse in Test 3 than in Test 2.
+
+Critique : Despite the above comparisons, it is not clear whether these tests can actually be
+compared to each other. Through the description we can see that Test 1 is very different from the more focused Test 2 and Test 3. Since Test 1 is being used as a baseline raw score for all the analysis, this difference is quite important. Further investigation is required to check: 
+*Did all the sampled students take similar tests in each round?
+*Do all the sampled students come from similar socio-economic backgrounds?
+*Do all the sampled schools have similar teaching methods, teaching quality and access to pedagogical resources?
+
+
+**(b) How many missing values are there for each test score? Is this a problem if you want to study pupils’ trajectories or progress? (0.5 point)**
+
+
+```{r, include=FALSE, warning=FALSE}
+
+#1b) Transition Matrix for NA values Test 1 to Test 2
+df2<-df1%>%
+mutate(d_gscore_t1=ifelse(is.na(d_gscore_t1),11,d_gscore_t1))%>%
+mutate(d_gscore_t2=ifelse(is.na(d_gscore_t2),11,d_gscore_t2))%>%
+mutate(d_gscore_t3=ifelse(is.na(d_gscore_t3),11,d_gscore_t3))
+View(df2)
+transNA12 <- crosstab(df2$d_gscore_t1, df2$d_gscore_t2, xlab="Deciles Test 2", ylab = "Deciles Test 1", prop.r = T)[2]
+transNA12 <- data.frame(transNA12)
+View(transNA12)
+transmNA12 <- matrix(transNA12[,3], nrow=11)
+transmNA12<- data.frame(transmNA12)
+View(transmNA12)
+transmNA12 <- transmNA12*100
+
+library(knitr)
+library(kableExtra)
+kable(transmNA12, caption = "Transition Matrix for NA Values") %>%
+kable_styling(bootstrap_options = c("condensed", "striped", "bordered")) %>%
+save_kable("Transition Matrix for NA Values.pdf")  
+```
+
+As mentioned above, the number of NA values are 110, 1978 and 2163 for Test 1, Test 2
+and Test 3 respectively. We know that missing data could be at random or could be not at random. If it is at random then there isn’t a statistical issue at hand. To test the randomness of NA values we need to check whether there is a relationship between NAs and the deciles of raw scores. It is possible that being in a lower decile for one test could increase the chances of a student to drop-out of school by the time the next test is conducted. We can compute a transition matrix for this analysis. The 11th column of the transition matrix is for the missing values. We can see that based on the a student’s decile in Test 1 the chances of missing values in Test 2 falls as we go up in the deciles. This suggests that if a pupil performs poorly in a test, the chances of that student dropping-out in the next test is high and thus the missing data provides vital information of discouraged poor performers. In such a situation, missing values would be important to chart out a pupil’s trajectory who has not done well on the previous test.
+
+**(c) Plot the global score after 3 years against the entry score. Can you find a more meaningful way to present this information? (0.5 point)**
+
+
+```{r, include=FALSE, warning=FALSE}
+
+#1c) Comparison of Test 1 and Test 2 Global Scores 
+#Plotting Graph:
+ggplot(df1, aes(x=gscore_t1, y=gscore_t2)) +
+geom_point() +
+geom_smooth(method=lm , color="red", se=FALSE) +
+xlab("Test 1 Global Score") +
+ylab("Test 2 Global Score") +
+geom_abline(slope = 1, intercept = 0, color="blue")
+ggsave("Comparison of Test 1 and Test 2.pdf")
+
+#Alternate method Correlation Coefficient 
+Cor12 <- cor(df1$gscore_t1, df1$gscore_t2, use="complete.obs")
+```
+
+The fitted blue line is displays the relationship of perfect correlation between Test 1 and Test 2. The actual fitted line is displayed by the red line. The regression line shows a positive relationship between Test 1 and Test 2 global scores. While comparing the two lines we can see that the actual regression line is above the perfect blue line for the lower quartile and below the blue line for the higher quartile. At first glance it seems like the lower quartile improves their test scores at a better rate than the higher quartile. However, we know that the number of missing data increases significantly from Test 1 to Test 2. We also know that the missing data appears non-random, since the chances of drop-out of a lower decile students is high. This causes distortions in the data for Test 2. So, it is difficult to make any definite inferences on the relationship between the two test scores by simply looking at this graph. Alternatively we could depict the relationship between the test scores through the correlation coefficients.
+
+
+**(d) Analyzing “progress” (2 points)**
+**(i) With the variables at hand, how would you measure a pupil’s progress between the first and the third year of primary school? Between the third year and the final year of primary school?**
+
+In order to analyse progress of a particular student we could adopt either an absolute measure or a relative measure. In absolute terms we can look at the difference in her global raw scores across the three tests. In relative terms, we can look at in which decile of her class does she fall into across the three tests. However, as mentioned before, we are uncertain of the comparability of the three tests and the comparability of the students. For instance, we don’t know whether a particular test was harder than the previous one. In such a case, it would be better to adopt a relative measure of progress of pupil’s test scores.
+
+
+
+**(ii) Implement the strategy you suggest and provide a summary of the distributions of the variables you computed.**
+
+``` {r, include=FALSE, warning=FALSE}
+###1d) Analyzing progress through Z-Scores 
+df1$Z_t1 <- (df1$gscore_t1 - mean(df1$gscore_t1, na.rm = TRUE))/sd(df1$gscore_t1, na.rm=TRUE)
+df1$Z_t2 <- (df1$gscore_t2 - mean(df1$gscore_t2, na.rm = TRUE))/sd(df1$gscore_t2, na.rm=TRUE)
+df1$Z_t3 <- (df1$gscore_t3 - mean(df1$gscore_t3, na.rm = TRUE))/sd(df1$gscore_t3, na.rm=TRUE)
+summary(df1$Z_t1) #mean is 0
+summary(df1$Z_t2) #mean is 0
+summary(df1$Z_t3) #mean is 0
+
+#Plotting distributions of Z-Scores
+ggplot(df1) +
+ggtitle("Distribution of Z-Scores") +
+geom_density(aes(x = Z_t1, col='a')) +
+geom_density(aes(x = Z_t2, col='b')) +
+geom_density(aes(x = Z_t3, col='c')) + 
+scale_colour_manual (name = "", values= c('a' = "indianred", 'b' = "forestgreen", 'c'= "navyblue"), labels= c('Test 1', 'Test 2', 'Test 3')) +
+ylab("Density") + xlab("Z-Scores") +
+theme(axis.line = element_line(colour = "black"), panel.border= element_blank(), panel.background = element_blank())
+ggsave("Distribution of Z-Scores.pdf")
+```
+
+To measure the relative progress of a student we can compute standardized z-scores of
+each test. The Z-Score from a normal distribution will tell us how far an individual raw test
+score is from the mean test score.
+$$𝑍_{i} = X_{i} − \overline{X}/sd𝑋_{i}$$
+: **Summary Statistics for Z-Scores of Test 1** 
+
+| Min | 1st Quart| Median | Mean | 3rd Quart  | Max |NAs|
+|:----:|:----:|:----:|:----:|:----:|:----:|:----:|
+|-4.6428|-0.6589|0.0587|0.00|0.7285|2.3239|110|
+
+
+: **Summary Statistics for Z-Scores of Test 2** 
+
+| Min | 1st Quart | Median | Mean | 3rd Quart | Max | NAs | 
+|:----:|:----:|:----:|:----:|:----:|:----:|:----:|
+|-4.5645 |-0.6403|  0.1069 | 0.00|  0.7482 | 2.2609 |1978| 
+
+
+: **Summary Statistics for Z-Scores of Test 3**
+
+| Min | 1st Quart | Median | Mean | 3rd Quart | Max | NAs | 
+|:----:|:----:|:----:|:----:|:----:|:----:|:----:|
+|-3.8904 |-0.6107 | 0.1068 | 0.00 | 0.7444 | 1.9673 | 2163 |
+
+*Interpretation of Z-Scores*
+
+* Evolution of Max and Min Scores :
++ For Test 1 we can see that the Z-Scores range from -4.643 (standard deviations below the mean) to +2.324 (standard deviations above the mean).  
++ For Test 2 we can see that Z-Scores range becoming slightly narrower from -4.565 (standard deviations below the mean) to +2.261 (standard deviations above the mean).
++ For Test 3 we can see the range further narrowing from -3.890 (standard deviations below the mean to) +1.967 (standard deviations above the mean).
+
+* Evolution of Median Scores
++ The median score goes from 0.0587 to 0.1069 to 0.1068 standard deviations above the mean. 
++ This implies an improvement in test scores for the majority of the students from Test 1 to Test 2 and then a plateauing from Test 2 to Test 3. A majority of the students perform slightly above the average student. 
+
+* Evolution of the 1st Quartile and 3rd Quartile Scores
++ We see a consistent fall in performance for the the 1st quartile of students (weak students). Their scores go from 0.6589 to 0.6403 to 0.6107 standard deviations below the mean. This persistent decline in performance of the weak students is worrying.
++ We see mostly similar scores for the 3rd quartile of students (strong students) with their scores ranging from 0.728 to 0.744 standard deviations above the mean. 
+
+* As discussed before, We can not make any conclusive statements on the performance of the weak and strong students due to the significant rise in missing values from Test 1 to Test 2 to Test 3. However, it is worth finding out the cause for weak students not being able to improve their performances across the tests. This could point towards structural problems in the schooling system that doesn't improve numeric and literal skills of weaker students. 
+
+
+**(e) Mobility between two successive tests. Focus on test scores expressed in deciles (they are stored under variables prefixed by “d ” in the dataset). The point of this question is to compute transition matrices between variables present in your dataset. Each cell pi,j of the 10x10 transition matrix between test A and test B represents the probability (as estimated by the realized share of students) that a student will be in decile j on test B, conditional on her score being in decile i on test A.Compute transition matrices across deciles of the global score distribution between test 1 and test 2, then between test 2 and test 3. Comment.(1 point)**
+
+To compute transition matrices, the crosstab function in R is used and then converted into a dataset. A transition matrix tells us the probability of a student trasitioning from one decile to an other, given the student's decile for the previous test. 
+
+```{r, include=FALSE, warning=FALSE}
+###1e) Transition Matrix from Test 1 to Test 2 
+trans12 <- crosstab(df1$d_gscore_t1, df1$d_gscore_t2, xlab="Deciles Test 2", ylab = "Deciles Test 1", prop.r = T)[2]
+trans12 <- data.frame(trans12)
+View(trans12)
+transm12 <- matrix(trans12[,3], nrow=10)
+transm12<- data.frame(transm12)
+View(transm12)
+transm12 <- 100*transm12
+
+
+#Transition Matrix from Test 2 to Test 3 
+trans23 <- crosstab(df1$d_gscore_t2, df1$d_gscore_t3, xlab="Deciles Test 3", ylab = "Deciles Test 2", prop.r = T)[2]
+trans23 <- data.frame(trans23)
+View(trans23)
+transm23 <- matrix(trans23[,3], nrow=10)
+transm23<- data.frame(transm23)
+View(transm23)
+transm23 <- 100*transm23
+
+#Create Kable Transition Matrix for Test 1 to Test 2
+library(knitr)
+library(kableExtra)
+kable(transm12, caption = "Transition Matrix for Test 1 to Test 2") %>%
+kable_styling(bootstrap_options = c("condensed", "striped", "bordered")) %>%
+save_kable("Transition Matrix Test 1 to Test 2.pdf")  
+
+#Create Kable Transition Matrix for Test 2 to Test 3
+kable(transm23, caption = "Transition Matrix for Test 1 to Test 2") %>%
+kable_styling(bootstrap_options = c("condensed", "striped", "bordered")) %>%
+save_kable("Transition Matrix for Test 2 to Test 3.pdf")
+```
+
+From the transition matrix for Test 1 to Test 2 we can see that those falling in the first decile have the highest chance of remaining in the first decile, followed by the probability of moving up by one decile. Those that fall in the 10th decile have the highest chance of remaining in the top most decile followed by the chance of dropping down to the 9th decile. This finding is not surprising as the construction of the transition matrix is such that the students in the lowest decile can only perform the same or do better and the students in the highest decile can only perform the same or do worse. 
+
+More interestingly, we note that :
++ Students in deciles 2, 3, 4 in Test 1 are most likely to fall by one decile in Test 2. 
++ Students in decile 5 for Test 1 have the highest chance of falling by two deciles in Test 2.
++ Students in decile 6 for Test 1 will approximately remain at the same decile fall by one in Test 2.
++ Students in decile 7 for Test 1 will most likely go up by 1 decile in Test 2.
++ Students in decile 8 will most likely go up by 1 decile in Test 2.
++ Students in decile 9 in Test 1 will most likely remain in the same decile for Test 2.
+
+The transition matrix of Test 2 to Test 3 shows greater rigidity in the movement of students across deciles. It appears that overall, most students are likely to remain in the same decile from test 2 to test 3 thus implying a certain state of stagnation.
+
+The trends of the first 5 deciles in the first transition matrix, coupled with the immobility of the deciles in the second transition matrix are particularly worrying. They could point towards an education system that is failing to improve the performance of those students who struggle to score well. A consistent drop in performance could push students further into a discouraged state of mind which could in-turn affect their academic performances. If this poor performance gets solidified it could further perpetuate a feeling of low self-esteem and helplessness thus leading to a vicious cycle. 
+
+
+
+
+**(f) In France, children are supposed to start primary school the year they turn six. Hence a school cohort typically includes pupils born between January 1st and December 31st of a given year.**
+
+
+**(i) Compare the global test scores of pupils born in January vs. those born in December on each of the three tests (“gscore t1”, “gscore t2”, “gscore t3”) and provide the 95% confidence interval for the difference between test scores. Interpret your findings. (2 points)**
+
+: Comparison of Global Test Scores for January and December born children
+
+| Scores | Test 1  Test 2 | Test 3 | 
+| :----: | :----: |:----:|:----:| 
+| Mean global score for Jan born | 72. 56 | 69.62 | 67.95 |
+| Mean global score for Dec born | 65.22 | 63.58 | 63.21 |
+| Diff in mean global scores | 7.34 | 6.04 | 4.74 |
+| CI at 95% level of diff | [6.12-8.58]| [4.07-7.77]| [2.29-6.42]|
+
+The difference between test scores for pupils born in January and December is statistically significant at the 5% level of significance. On average, we see that for test 1, if a child was born in December it is likely that she will have meant 7.5 points less than the children born in January. However, we must bear in mind that the confidence interval do overlap, thus making it hard to draw any solid conclusions on this trend. A reason for this difference in test scores could be that the elementary school year begins in September for all 6 year olds. There is literature to prove that older children perform better on academic tests thus giving the January born children a sort of advantage in terms of cognitive and social maturity over the December born children. 
+
+
+```{r, include=FALSE, warning=FALSE}
+###1f) Difference in test scores over birth months
+#Test scores of those born in January:
+t1jan <- lm(df1$gscore_t1[df1$birthm==1]~1,na.rm=T)
+t1jan #72.56
+t2jan <- lm(df1$gscore_t2[df1$birthm==1]~1,na.rm=T)
+t2jan #69.62
+t3jan <- lm(df1$gscore_t3[df1$birthm==1]~1,na.rm=T)
+t3jan #67.95
+
+#Test scores of those born in December:
+t1dec <- lm(df1$gscore_t1[df1$birthm==12]~1,na.rm=T)
+t1dec #65.22
+t2dec <- lm(df1$gscore_t2[df1$birthm==12]~1,na.rm=T)
+t2dec #63.58
+t3dec <- lm(df1$gscore_t3[df1$birthm==12]~1,na.rm=T)
+t3dec #63.21
+
+#Differences:
+#For test 1:
+df1$t1dif[df1$birthm==1] <- df1$gscore_t1[df1$birthm==1]-df1$gscore_t1[df1$birthm==12]
+reg <- lm(df1$t1dif[df1$birthm==1]~1, na.rm=TRUE)
+reg #7.35
+confint(reg,level=0.95) #[6.12;8.58]
+#For test 2:
+df1$t2dif[df1$birthm==1] <- df1$gscore_t2[df1$birthm==1]-df1$gscore_t2[df1$birthm==12]
+reg2 <- lm(df1$t2dif[df1$birthm==1]~1, na.rm=TRUE)
+reg2 #5.92
+confint(reg2,level=0.95) #[4.07;7.77]
+#For test 3:
+df1$t3dif[df1$birthm==1] <- df1$gscore_t3[df1$birthm==1]-df1$gscore_t3[df1$birthm==12]
+reg3 <- lm(df1$t3dif[df1$birthm==1]~1, na.rm=TRUE)
+reg3 #4.36
+confint(reg3,level=0.95) #[2.29;6.42]
+#Test whether these differences are significant:
+t.test(df1$t1dif) #p-value is highly significant
+t.test(df1$t2dif) #p-value is highly significant
+t.test(df1$t3dif) #p-value is highly significant
+#Significant difference over time?
+t.test(df1$t1dif,df1$t2dif) #no
+t.test(df1$t2dif,df1$t3dif) #no
+t.test(df1$t1dif,df1$t3dif) #Yes
+jan <- c(72.56,69.62,67.95)
+dec <- c(65.22,63.58,63.21)
+dif <- c(7.34,6.04,4.74)
+ci <- c("[6.12;8.58]","[4.07;7.77]","[2.29;6.42]")
+table <- rbind(jan,dec,dif,ci)
+
+```
+
+
+**(ii) Compare the evolution of the January vs. December global test score gap in the different years with the evolution of the global test score gap between children of executives/professionals and children of blue-collars (use the “parent occ” variable), with the 95% confidence interval for that gap. Interpret your results. (2 points)**
+
+```{r, include=FALSE, warning=FALSE}
+#Test scores of children of executives/professionals (parent_occ=3):
+t1pro <- lm(df1$gscore_t1[df1$parent_occ==3]~1,na.rm=T)
+t1pro #75.71
+t2pro <- lm(df1$gscore_t2[df1$parent_occ==3]~1,na.rm=T)
+t2pro #74.45
+t3pro <- lm(df1$gscore_t3[df1$parent_occ==3]~1,na.rm=T)
+t3pro #76.18
+
+#Test scores of children of blue-collar workers (parent_occ=5):
+t1bc <- lm(df1$gscore_t1[df1$parent_occ==5]~1,na.rm=T)
+t1bc #68.59
+t2bc <- lm(df1$gscore_t2[df1$parent_occ==5]~1,na.rm=T)
+t2bc #66.14
+t3bc <- lm(df1$gscore_t3[df1$parent_occ==5]~1,na.rm=T)
+t3bc #65.46
+
+#Differences:
+#For test 1:
+df1$t1difprof[df1$parent_occ==3] <- df1$gscore_t1[df1$parent_occ==3]-df1$gscore_t1[df1$parent_occ==5]
+reg4 <- lm(df1$t1difprof[df1$parent_occ==3]~1, na.rm=TRUE)
+reg4 #7.24
+confint(reg4,level=0.95) #[6.38;8.10]
+#For test 2:
+df1$t2difprof[df1$parent_occ==3] <- df1$gscore_t2[df1$parent_occ==3]-df1$gscore_t2[df1$parent_occ==5]
+reg5 <- lm(df1$t2difprof[df1$parent_occ==3]~1, na.rm=TRUE)
+reg5 #8.72
+confint(reg5,level=0.95) #[7.54,9.90]
+#For test 3:
+df1$t3difprof[df1$parent_occ==3] <- df1$gscore_t3[df1$parent_occ==3]-df1$gscore_t3[df1$parent_occ==5]
+reg6 <- lm(df1$t3difprof[df1$parent_occ==3]~1, na.rm=TRUE)
+reg6 #10.75
+confint(reg6,level=0.95) #[9.47;12.03]
+#Test whether these differences are significant:
+t.test(df1$t1difprof) #p-value is highly significant
+t.test(df1$t2difprof) #p-value is highly significant
+t.test(df1$t3difprof) #p-value is highly significant
+
+#Significant difference over time?
+t.test(df1$t1difprof,df1$t2difprof) #Yes
+t.test(df1$t2difprof,df1$t3difprof) #Yes
+t.test(df1$t1difprof,df1$t3difprof) 
+pro <- c(75.71,74.45,76.18)
+bc <- c(68.59,66.14,65.46)
+dif2 <- c(7.12,8.31,10.72)
+ci2 <- c("[6.38;8.10]","[7.54,9.90]","[9.47;12.03]")
+table2 <- rbind(pro,bc,dif2,ci2)
+```
+
+: Comparison of Global Test Scores for January and December born children
+
+| Scores | Test 1  Test 2 | Test 3 | 
+| :----: | :----: |:----:|:----:| 
+| Mean global score for Jan born | 72. 56 | 69.62 | 67.95 |
+| Mean global score for Dec born | 65.22 | 63.58 | 63.21 |
+| Diff in mean global scores | 7.34 | 6.04 | 4.74 |
+| CI at 95% level of diff | [6.12-8.58]| [4.07-7.77]| [2.29-6.42]|
+
+The difference between test scores for pupils born in January and December is statistically significant at the 5% level of significance. On average, we see that for test 1, if a child was born in December it is likely that she will have meant 7.5 points less than the children born in January. However, we must bear in mind that the confidence interval do overlap, thus making it hard to draw any solid conclusions on this trend. A reason for this difference in test scores could be that the elementary school year begins in September for all 6 year olds. There is literature to prove that older children perform better on academic tests thus giving the January born children a sort of advantage in terms of cognitive and social maturity over the December born children. 
+
+**(iii) Why is the comparison of test scores of children born in January vs. December likely to underestimate the true effect of relative age differences on test scores? (1 point) (Hint: think of the dates at which each pupil took the different tests.)**
+
+In France, the compulsory age to start primary school is 6 year. In reality, parents decide to put a child in a year below or above depending on whether she was born in January or December. This is done to avoid a situation wherein the child is the oldest or the youngest in class since parents would prefer their children compete in a class with similar levels of cognition. We are also aware of the fact that some children could repeat a year of school. These two factors could distort our data and cause an underestimation of the differences of test scores based on age.  
+
+
+
+#####**Exercise II. Education in OECD Countries : **
+
+*The dataset “pisa 2012.dta” is an excerpt from the 2012 wave of the Programme for International Student Assessment (PISA) survey for some OECD and non-OECD countries (namely Norway, Finland, France and Vietnam). PISA is a survey developed by the Organisation for Economic Co-operation and Development (OECD). Implemented on a triennial basis, it aims at collecting school performance data on youth at age 15 in about 65 countries worldwide. Tests are administered to pupils at school, in three different topics: maths, reading and science. Additional survey data collects information on pupil, parent and school characteristics. The PISA tests are meant to assess pupils’ skills rather than academic achievement. The test as a whole comprises 13 booklets (a booklet is a set of questions), among which 7 for mathematics, 3 for reading and 3 for science. Each pupil is administered 4 booklets out of the 13; thus, no pupil is supposed to answer all questions of all booklets. Each pupil’s overall skill level in mathematics, reading and science, is represented by 5 “plausible values” for each. Each plausible value is the result of an estimation procedure of a predictive model based on how pupils answered to their tests. The model used by the OECD is derived from the Rasch model, and basically relates a set of items to a person’s skills, where each person’s answer to each item can be “valued”, i.e. deemed correct or not.1 This means that generally speaking, to estimate models or simple descriptive statistics on overall skill data, you must run the same estimation 5 times, on each plausible value, and then work your way through from these 5 “plausible” results to the final one: For instance, a “final” average mean will be the mean of the five plausible mean values (computed each on a different plausible value variable). Similarly, the standard error of such mean will be the square root of a sum of two elements: [mean sampling variance, i.e. the mean of the 5 variances (one for each mean computed on a plausible value variable)] + 1.2 [“imputation” variance, or “measurement error” variance, which is equal to 1/4 of the sum of squared differences between the final mean and each of 5 “plausible” means]. More details are available in the PISA Data Analysis Manual.The 2012 PISA survey’s focus was on mathematics. Accordingly, not only did more of the test questions deal with mathematics than with other domains, but the pupil-level survey also included longer sections on subjective assessment from the pupil’s part on different mathematics-related topics. Among those, you’ll find questions on how the pupil considers her own performance and capabilities in mathematics, but also questions on how motivated the pupil is, etc. The information contained in a pupil’s answers to these questions is summed up in a few aggregate indices. These “subjective” questions are asked according to a rotating pattern: each student is asked to answer two randomly-chosen thirds of the questionnaire. This means that missing values for the “indices” variables in your database (i.e., for instance, INSTMOT, SCMAT, ANXMAT, FAILMAT, MATBEH, MATHEFF, MATINTFC) are a feature of the survey design, and can be considered random. The PISA survey data works with Balanced Repeated Replication weights. This is a technique which aims at estimating sampling variances of statistics obtained through stratified sampling. The basic idea is that your statistical software is going to replicate each command 80 times, each with a different set of pre-determined weights (variables W FSTR1 to W FSTR80 in your dataset), and that these 80 replications allow you to compute variances and standard errors.*
+
+**2.1)How many missing values do the plausible values for maths, reading and science have? What else can you say about missing values in this dataset? (2 points)**
+
+```{r, include=FALSE, warning=FALSE}
+
+###load data for PISA : pisa_2012.dta , functions_pisa.R , panel97.dta
+
+pisa_2012 <- read_dta("C:/Users/Shreya/Downloads/hw6/pisa_2012.dta")
+panel97 <- read_dta("C:/Users/Shreya/Downloads/hw6/panel97.dta")
+functions_pisa <- load("C:/Users/Shreya/Downloads/hw6/functions_pisa.R")
+
+##Descriptive Stats : 
+sum(pisa_2012$CCODE=="FIN")
+sum(pisa_2012$CCODE=="NOR")
+sum(pisa_2012$CCODE=="VNM")
+sum(pisa_2012$CCODE=="FRA")
+
+## Need to remove labels from columns GENDER for data manipulation as it is haven_labelled
+unclass(pisa_2012$GENDER)
+
+# Countries in the sample for PISA scores: Finland (country no. = 1), Norway (CNT_num = 2), Vietnam (CNT_num = 3), France (CNT_num = 4)
+#23087 rows, 331 columns 
+#FIN = 8829 rows
+#NOR = 4686 rows
+#VNM = 4959 rows
+#FRA = 4613 rows
+
+#2.1) Calculate missing values for all plausible values
+sum(is.na(pisa_2012$PV1MATH)) # 0 NAs
+sum(is.na(pisa_2012$PV2MATH))# 0 NAs
+sum(is.na(pisa_2012$PV3MATH))# 0 NAs
+sum(is.na(pisa_2012$PV4MATH))# 0 NAs
+sum(is.na(pisa_2012$PV5MATH))# 0 NAs
+sum(is.na(pisa_2012$PV1SCIE))# 0 NAs
+sum(is.na(pisa_2012$PV2SCIE))# 0 NAs
+sum(is.na(pisa_2012$PV3SCIE))# 0 NAs
+sum(is.na(pisa_2012$PV4SCIE))# 0 NAs
+sum(is.na(pisa_2012$PV5SCIE))# 0 NAs
+sum(is.na(pisa_2012$PV1READ))# 0 NAs
+sum(is.na(pisa_2012$PV2READ))# 0 NAs
+sum(is.na(pisa_2012$PV3READ))# 0 NAs
+sum(is.na(pisa_2012$PV4READ))# 0 NAs
+sum(is.na(pisa_2012$PV5READ))# 0 NAs
+```
+There are no missing values for any of the plausible values for maths, reading and science as the PISA computes plausible values based on prediction models which allows for non-responses to be coded. However, there are missing values for indices values which as specified in the manual, are missing by design and are thus random.  Further, the PISA data manual states that missing data is divided into 4 categories namely, item level non-response, multiple or invalid response, not administered response and not reached responses. These four categories of missing values are given specific codes and accordingly represented in the data set. It is also stated that contextual variables usually have missing data which leads to biased results. However, since only 2 of 3 variables of the data were missing, the bias was considered negligible. The above discussion requires more in depth analysis in order to understand the complexity of accounting for missing values in the data set. 
+
+
+**2.2)Run the "functions pisa" file. Describe each step of the function fun.pv(), and explain in your own words the underlying idea of the estimation procedure.** 
+
+We can describe the steps of the function fun.pv() in the following way:
+
+* **Step 1** : The function fun.pv() is defined for plausible values (pvnames) in the data set of PISA form the defined working directory.
+
+* **Step 2** : The function pv.input defines what is going to be considered as input for our function fun.pv(). 
+
+* **Step 3** : Within the pv.input() function, the function R.mean is defined. The outer function computes weighted mean estimates for every plausible value. To do so, it uses 80 different weights, following the Balanced Repeated Replication approach adopted by method PISA. This means that we have 80 R.mean estimates for each of the five plausible values, so 400 in total. R.sd shows the computed standard deviation for each of the 400 mean estimates. 
+
+* **Step 4** : The function PV.mean() obtains the mean of the five plausible values for each topic by computing their weighted average. The weight used here is the predefined weight "weightFinal". The computation is done at the country level. The function PV.sd() computes the standard deviation for the mean estimates of the five plausible values.
+
+* **Step 5** : The MEAN.m() computes the average of the five plausible mean values. The function SD.m() computes the mean of PV.sd(), the estimate of the standard deviation for the mean estimates
+of the five plausible values. 
+
+* **Step 6** : In this step we use the function var.mean.w() to compute the mean sampling variance by doing the sum of the square of the difference of each
+of the 80 mean estimates found in the first step and the mean estimate of PV.mean, divided by 20. We divide by 20 because PISA adopts the Fay's variant of the Balanced Repeated Replication which involves multiplying the school weight by a factor 0.5 for replicate samples (80 replicates for PISA). The, we take the square root of the result to have the standard deviation.
+
+* **Step 7** : In this next step, we use the var.mean.b() function to compute the imputation variance which is defined as the "measurement error" variance. This is equal to a quarter of the sum of the squared difference between the final mean and each of the five plausible means.
+
+* **Step 8** : The mean.se() function computes the standard error of the final mean. We take the square root of var.mean.w +
+1.2 times var.mean.b 
+
+* **Step 9** : LB and UB are defined as the lower and upper bounds of the final average value at the 95% confidence interval. 
+
+* **Step 10** : The function result() specifies what the outputs are. It consists of a data frame with fie columns and each
+column contains the variables computed above. Freq is the number of observations for the plausible values and Mean is the mean of those fie values, while s.e. is their standard error. LB and UB are the lower and upper bound of the confidence interval at the 95% confidence interval. For simplicity, the results are rounded to two decimal places.
+
+
+The overall idea of the function is to compute plausible values for each subject using the method of replication and the weights from the Balanced Repeated Replication (BRR) adjusted with the Fay factor. We have 5 plausible values which are then averaged using the final weight to get the average plausible value for a given subject.
+
+
+**2.2)** *For each country in the dataset, compute the country-level average scores in mathematics,reading and science. Can you rank countries in a meaningful way? What could explain differences between countries?*
+
+
+```{r, include=FALSE, warning=FALSE}
+
+
+#2.2) Country Comparison 
+
+### See the functions_pisa.R script for details on the function "fun.pv" 
+
+#For Finland:
+fun.pv(pisa_2012$PV1MATH, pisa_2012[pisa_2012$CNT=="Finland", ], folder= getwd()) #518.75 SE=1.94
+fun.pv(pisa_2012$PV1READ, pisa_2012[pisa_2012$CNT=="Finland", ], folder= getwd()) #524.02 SE=2.38
+fun.pv(pisa_2012$PV1SCIE, pisa_2012[df2$CNT=="Finland", ], folder= getwd()) #545.44 SE=2.2
+
+#For Norway:
+fun.pv(pisa_2012$PV2MATH, pisa_2012[pisa_2012$CNT=="Norway", ], folder= getwd()) #489.37 SE=2.73
+fun.pv(pisa_2012$PV2READ, pisa_2012[pisa_2012$CNT=="Norway", ], folder= getwd()) #503.94 SE=3.22
+fun.pv(pisa_2012$PV2SCIE, pisa_2012[pisa_2012$CNT=="Norway", ], folder= getwd()) #494.52 SE=3.09
+
+#For France:
+fun.pv(pisa_2012$PV4MATH, pisa_2012[pisa_2012$CNT=="France", ], folder= getwd()) #494.98 SE=2.45
+fun.pv(pisa_2012$PV4READ, pisa_2012[pisa_2012$CNT=="France", ], folder= getwd()) #505.48 SE=2.83
+fun.pv(pisa_2012$PV4SCIE, pisa_2012[pisa_2012$CNT=="France", ], folder= getwd()) #498.97 SE=2.58
+
+#For Vietnam:
+fun.pv(pisa_2012$PV3MATH, pisa_2012[pisa_2012$CNT=="Viet Nam", ], folder= getwd()) #511.34 SE=4.84
+fun.pv(pisa_2012$PV3READ, pisa_2012[pisa_2012$CNT=="Viet Nam", ], folder= getwd()) #508.22 SE=4.4
+fun.pv(pisa_2012$PV3SCIE, pisa_2012[pisa_2012$CNT=="Viet Nam", ], folder= getwd()) #528.42 SE=4.31
+
+
+meanfinland <- c(518.75,524.02,545.44)
+sefinland <- c("(1.94)","(2.38)", "(2.2)")
+meannorway <- c(489.37,503.94,494.52)
+senorway <- c("(2.73)","(3.22)","(3.09)")
+meanfrance <- c(494.98,505.48,498.97)
+sefrance <- c("(2.45)","(2.83)","(2.58)")
+meanviet <- c(511.34,508.22,528.42)
+seviet <- c("(4.84)","(4.4)","(4.31)")
+
+table2.2 <- rbind(meanfinland,sefinland,meannorway,senorway,meanfrance,sefrance,meanviet,seviet)
+
+row.names(table2.2) <- c("Average score", "Standard Error","Average score", "Standard Error","Average score")%>% kable(table4, caption="Average scores in Maths, Reading and Science in Finland, Norway, France and Vietnam") %>%
+kable_styling(latex_options="hold_position", position="center") %>%
+group_rows( "Finland", 1,2) %>%
+group_rows( "Norway", 3,4) %>%
+group_rows( "France", 5,6) %>%
+group_rows( "Vietnam", 7,8)
+```
+
+: **Average Scores in Math, Reading and Science for Countries**[^1]
+
+| Country | Math | Reading | Science | 
+| :----: | :----: | :----: | :----: |
+| Finland | 518.75 | 524.02 | 545.44 |
+|         | (1.94) | (2.38) | (2.2) |
+| Norway | 489.37 | 503.94 | 494.52 |
+|        | (2.73) | (3.22) | (3.09) |
+| France | 494.98 | 505.48 | 498.97 |
+|        | (2.45) | (2.83) | (2.58) |
+| Vietnam | 511.34 | 508.22 | 528.42 |
+|         | (4.84) | (4.4) | (4.31) |
+
+[^1]: *Note - The table provides average test scores in math, reading and science for the four chosen countries. Standard errors of the average scores are provided in the parenthesis.* 
+
+We can begin with a within country relative analysis of subject scores. For Finland we notice that pupils perform best in science, followed by reading and then math. In Norway and France, students are good in reading, followed by science and then math. While in Vietnam, the average scores are quite similar with students performing best in science followed by math and then reading. 
+
+Matters get more complicated if we attempt to do a cross-country analysis of the scores. It would be naive and faulty to compare average scores of say math in Vietnam and France since we are uncertain whether the two samples are comparable. We are not sure whether the difference in average test scores is purely an exogenous phenomenon. Variables such as school environment, socio-economic backgrounds of the students, food consumption patters of the students, government education policies, mental health of students, culture specific academic goals and norms, compulsory school attendance age and are other relevant variables could be different across countries. All of these variables could impact the performance of a student in Vietnam differently than the performance of a student in France thus causing problems of endogenity in our outcome model.
+
+Indeed, compulsory school ages are 6-16 for Norway, 6-16 for Finland though the recommended age is 7 years, 6-16 for France but around a vast majority of kids start school by 3 years, for Vietnam only 5 years of schooling is compulsory. Additionally, according to World Bank data, the share of government expenditure on education as percentage of total GDP was 5.5% in France (2017), 6.4% in Finland (2017), 7.91% in Norway (2017) and 4.2% in Vietnam (2018). These figures indicate that countries are vastly different in a myriad of ways which impact the way its students learn and grasp concepts. Thus, we can not rank countries based merely on the average test scores.  
+
+**2.3)** *Using the same methodology as in question 2, compute the average scores in reading, mathematics,and science for girls and boys separately. Comment.* 
+
+```{r, include=FALSE, warning=FALSE}
+#Question 2.3
+
+#We compute with the same method the average scores in each subject for girls and boys. Since the gender class is "haven labelled" "vctrs" and "double" we use dplyr package to create a new dataframe of pisa_2012 for girls and boys 
+
+pisa_2012boys <- filter(pisa_2012, GENDER==1)
+pisa_2012girls <- filter(pisa_2012$GENDER==0)
+
+#For boys avg scores : 
+fun.pv(mean(PV1MATH,PV2MATH, PV3MATH, PV4MATH), pisa_2012boys, folder= getwd()) #508.77 SE=3.43
+fun.pv(mean(PV1READ,PV2READ, PV3READ, PV4READ), pisa_2012boys, folder= getwd()) #487.91 SE=3.18
+fun.pv(mean(PV1SCIE,PV2SCIE, PV3SCIE, PV4SCIE), pisa_2012boys, folder= getwd()) #515.41 SE=3.4
+
+#For girls avg scores : 
+fun.pv(mean(PV1MATH,PV2MATH, PV3MATH, PV4MATH), pisa_2012girls, folder= getwd()) #500.44 SE=2.88
+fun.pv(mean(PV1READ,PV2READ, PV3READ, PV4READ), pisa_2012girls, folder= getwd()) #525.37 SE=2.58
+fun.pv(mean(PV1SCIE,PV2SCIE, PV3SCIE, PV4SCIE), pisa_2012girls, folder= getwd()) #517.03 SE=2.64
+
+##Presenting the avg scores of girls and boys : 
+meanboys <- c(508.77,487.91,515.41)
+ciboys <- c("[502.06;515.48]","[481.69;494.14]", "[508.75;522.08]") 
+meangirls <- c(500.44,525.37,517.03)
+cigirls <- c("[494.8;506.08]","[520.33;530.42]","[511.84;522.21]")
+table2.3 <- rbind(meanboys,ciboys,meangirls,cigirls)
+row.names(table2.3) <- c("Average score", "Confidence Interval","Average score", "Confidence Interval")%>% kable(table5, caption="Average scores in Maths, Reading and Science for boys and girls") %>% col.names=c("Mathematics") %>% kable_styling(latex_options="hold_position", position="center") %>%
+group_rows( "Boys",1,2) %>%
+group_rows("Girls",3,4)
+
+```
+
+: Average Scores in Math, Reading and Science for Girls and Boys
+
+| Sex | Math | Reading | Science | 
+| :----: | :----: | :----: | :----: | 
+| Girls | 500.44 | 525.37 | 517.03 |
+| Boys  | 508.77 | 487.91 | 515.41 |
+
+Here we are analysing the mean of the means of the different scores for 15 year old girls and boys. According to the above table, boys perform slightly better than girls in math, worse than girls in reading and slightly worse than girls in science. There is a lively debate on the relationship of the sex of a child and their performance in academic tests. The stereotype is that boys do better in math tests and girls do better in reading tests. However, there is robust literature to argue that test scores are actually significantly affected by social conditioning. Indeed, the four countries we are studying have relatively higher gender parity than other countries and thus we see such a small difference in test scores for math. This implies that performance on tests are not dependent on intrinsic biological factors but by societal norms and attitudes. 
+
+**2.4)** *Are differences between girls and boys the same across countries? Find a meaningful, clear and complete way to represent your results, and comment.*
+
+
+```{r, include=FALSE, warning=FALSE}
+#Question 2.4
+
+#For Finland diff in scores by gender : 
+
+#Boys
+fun.pv(PV1MATH, pisa_2012boys[df2boys$CNT=="Finland", ], folder= getwd()) #517.39 SE=2.63
+fun.pv(PV1READ, pisa_2012boys[df2boys$CNT=="Finland", ], folder= getwd()) #494.01 SE=3.15
+fun.pv(PV1SCIE, pisa_2012boys[df2boys$CNT=="Finland", ], folder= getwd()) #537.44 SE=2.98
+
+#girls
+fun.pv(PV1MATH, pisa_2012girls[pisa_2012girls$CNT=="Finland", ], folder= getwd()) #520.19 SE=2.16
+fun.pv(PV1READ, pisa_2012girls[pisa_2012girls$CNT=="Finland", ], folder= getwd()) #555.71 SE=2.38
+fun.pv(PV1SCIE, pisa_2012girls[pisa_2012girls$CNT=="Finland", ], folder= getwd()) #553.89 SE=2.28
+
+#For Norway diff in scores by gender :
+
+#Boys
+fun.pv(PV2MATH, pisa_2012boys[pisa_2012boys$CNT=="Norway", ], folder= getwd()) #490.4 SE=2.8
+fun.pv(PV2READ, pisa_2012boys[pisa_2012boys$CNT=="Norway", ], folder= getwd()) #481.28 SE=3.34
+fun.pv(PV2SCIE, pisa_2012boys[pisa_2012boys$CNT=="Norway", ], folder= getwd()) #492.79 SE=3.22
+
+#Girls
+fun.pv(PV2MATH, pisa_2012girls[pisa_2012girls$CNT=="Norway", ], folder= getwd()) #488.29 SE=3.43
+fun.pv(PV2READ, pisa_2012girls[pisa_2012girls$CNT=="Norway", ], folder= getwd()) #527.77 SE=3.86
+fun.pv(PV2SCIE, pisa_2012girls[pisa_2012girls$CNT=="Norway", ], folder= getwd()) #496.35 SE=3.74
+
+#For France diff in scores by gender : 
+
+#Boys
+fun.pv(PV4MATH, pisa_2012boys[pisa_2012boys$CNT=="France", ], folder= getwd()) #499.35 SE=3.41
+fun.pv(PV4READ, pisa_2012boys[pisa_2012boys$CNT=="France", ], folder= getwd()) #482.97 SE=3.81
+fun.pv(PV4SCIE, pisa_2012boys[pisa_2012boys$CNT=="France", ], folder= getwd()) #497.72 SE=3.82
+
+#Girls
+fun.pv(PV4MATH, pisa_2012girls[pisa_2012girls$CNT=="France", ], folder= getwd()) #490.85 SE=2.55
+fun.pv(PV4READ, pisa_2012girls[pisa_2012girls$CNT=="France", ], folder= getwd()) #526.77 SE=3.01
+fun.pv(PV4SCIE, pisa_2012girls[pisa_2012girls$CNT=="France", ], folder= getwd()) #500.16 SE=2.42
+
+#For Vietnam diff in scores by gender : 
+
+#Boys:
+fun.pv(PV3MATH, pisa_2012boys[pisa_2012boys$CNT=="Viet Nam", ], folder= getwd()) #516.64 SE=5.57
+fun.pv(PV3READ, pisa_2012boys[pisa_2012boys$CNT=="Viet Nam", ], folder= getwd()) #491.73 SE=4.98
+fun.pv(PV3SCIE, pisa_2012boys[pisa_2012boys$CNT=="Viet Nam", ], folder= getwd()) #528.98 SE=5.03
+
+#Girls
+fun.pv(PV3MATH, pisa_2012girls[pisa_2012girls$CNT=="Viet Nam", ], folder= getwd()) #506.74 SE=4.65
+fun.pv(PV3READ, pisa_2012girls[pisa_2012girls$CNT=="Viet Nam", ], folder= getwd()) #522.53 SE=3.95
+fun.pv(PV3SCIE, pisa_2012girls[pisa_2012girls$CNT=="Viet Nam", ], folder= getwd()) #527.94 SE=4.06
+
+math <- read_excel("math.xlsx")
+read <- read_excel("read.xlsx")
+scie <- read_excel("science.xlsx")
+
+#Present the values in a meaningful way:
+
+#In Maths:
+pos <- position_dodge(0.1)
+math_graph <- ggplot(math, aes(x=Country, y=Mean, colour=Gender)) +
+geom_errorbar(aes(ymin=LB, ymax=UB), width=.2, position=pos) +
+geom_line(position=pos) +
+geom_point(position=pos, size=2, shape=21, fill="white") +
+geom_text(aes(label=Mean),hjust=-0.1, vjust=-0.1) +
+ggtitle("Average scores in Maths by gender and country")
+math_graph
+
+#In Reading:
+read_graph <- ggplot(read, aes(x=Country, y=Mean, colour=Gender)) +
+geom_errorbar(aes(ymin=LB, ymax=UB), width=.2, position=pos) +
+geom_line(position=pos) +
+geom_point(position=pos, size=2, shape=21, fill="white") +
+geom_text(aes(label=Mean),hjust=-0.1, vjust=-0.1) +
+ggtitle("Average scores in Reading by gender and country")
+read_graph
+
+#In Science:
+sci_graph <- ggplot(scie, aes(x=Country, y=Mean, colour=Gender)) +
+geom_errorbar(aes(ymin=LB, ymax=UB), width=.2, position=pos) +
+geom_line(position=pos) +
+geom_point(position=pos, size=2, shape=21, fill="white") +
+geom_text(aes(label=Mean),hjust=-0.1, vjust=-0.1) +
+ggtitle("Average scores in Science by gender and country")
+sci_graph
+```
+
+Interpretation of the graphs :
+* Math Scores - The confidence intervals for the difference between boys and girls overlap, with wider intervals for Vietnam. However, we can not draw any conclusion, due to absence of statistical significance.  
+* Reading Scores - The difference in scores between girls and boys is highest in Finland, while France Norway and Vietnam display similar results. 
+* Science Scores - The difference in scores between girls and boys is highest in Finland whereas this significant gap isn't witnessed for Vietnam, France and Norway. 
+
+The above results indicate that the structure of the education system in Finland has significant gender differences. Indeed, it is noted that the cultural norms in Finland are such that girls are provided greater positive reinforcement for academic learning while boys are expected to perform more vocational tasks. This difference in social attitudes results in a majority of girls choosing general upper secondary school and a majority of boys choosing vocational education and training. It is important for the schooling system of a region to take into account the prevailing gender stereotypes in its society and take measures so as to not perpetuate them in the school environment. 
+
+**2.5)** *Have a look at the indices of self-assessment in mathematics. Compare boys and girls along these variables and across countries3. Describe each step of the function fun, and explain in your own words the underlying idea of the estimation procedure. Comment.*
+
+```{r, include=FALSE, warning=FALSE}
+#Question 2.5
+
+###Indicators of Self Assessment in Mathematics : 
+
+#ANXMAT : A measure of Mathematics anxiety comprising questions like “Are you afraid to fail in a maths test?”. 
+#SCMAT : A measure of self-concept in Mathematics with self-assessment statements like “I am generally good at maths”.
+#FAILMAT : A measure of the attributions to failure in Mathematics.
+
+### Creating the "fun" function for the 3 indices of self assessment in Math and comparing the 3 indices across the countris: See functions_pisa.R for more details on the function "fun". 
+
+ANXMAT <- c("ANXMAT")
+fun(ANXMAT,pisa_2012boys[pisa_2012boys$CNT=="Finland",])
+fun(ANXMAT,pisa_2012girls[pisa_2012girls$CNT=="Finland",])
+fun(ANXMAT,pisa_2012boys[pisa_2012boys$CNT=="Norway",])
+fun(ANXMAT,pisa_2012girls[pisa_2012girls$CNT=="Norway",])
+fun(ANXMAT,pisa_2012boys[pisa_2012boys$CNT=="France",])
+fun(ANXMAT,pisa_2012girls[pisa_2012girls$CNT=="France",])
+fun(ANXMAT,pisa_2012boys[pisa_2012boys$CNT=="Viet Nam",])
+fun(ANXMAT,pisa_2012girls[pisa_2012girls$CNT=="Viet Nam",])
+
+SCMAT <- c("SCMAT")
+fun(SCMAT,pisa_2012boys[pisa_2012boys$CNT=="Finland",])
+fun(SCMAT,pisa_2012girls[pisa_2012girls$CNT=="Finland",])
+fun(SCMAT,pisa_2012boys[pisa_2012boys$CNT=="Norway",])
+fun(SCMAT,pisa_2012girls[pisa_2012girls$CNT=="Norway",])
+fun(SCMAT,pisa_2012boys[pisa_2012boys$CNT=="France",])
+fun(SCMAT,pisa_2012girls[pisa_2012girls$CNT=="France",])
+fun(SCMAT,pisa_2012boys[pisa_2012boys$CNT=="Viet Nam",])
+fun(SCMAT,pisa_2012girls[pisa_2012girls$CNT=="Viet Nam",])
+
+FAILMAT <- c("FAILMAT")
+fun(FAILMAT,pisa_2012boys[pisa_2012boys$CNT=="Finland",])
+fun(FAILMAT,pisa_2012girls[pisa_2012girls$CNT=="Finland",])
+fun(FAILMAT,pisa_2012boys[pisa_2012boys$CNT=="Norway",])
+fun(FAILMAT,pisa_2012girls[pisa_2012girls$CNT=="Norway",])
+fun(FAILMAT,pisa_2012boys[pisa_2012boys$CNT=="France",])
+fun(FAILMAT,pisa_2012girls[pisa_2012girls$CNT=="France",])
+fun(FAILMAT,pisa_2012boys[pisa_2012boys$CNT=="Viet Nam",])
+fun(FAILMAT,pisa_2012girls[pisa_2012girls$CNT=="Viet Nam",])
+
+
+## Presenting the cross-country analysis 
+
+meanfin <- c(-0.52,-0.13)
+cifin <- c("[-0.56;-0.48]","[-0.17;-0.08]")
+meannor <- c(-0.16,0.2)
+cinor <- c("[-0.21;-0.1]","[0.14;0.26]")
+meanfr <- c(0.05,0.49)
+cifr <- c("[0;0.1]","[0.45;0.53]")
+meanviet <- c(0.15,0.27)
+civiet <- c("[0.11;0.2]","[0.23;0.31]")
+table2.5.1 <- rbind(meanfin,cifin,meannor,cinor,meanfr,cifr,meanviet,civiet)
+
+row.names(table2.5.1) <- c("Average score", "Confidence Interval","Average score", "Confidence Interval") %>%
+kable(table2.5.1, caption="Average values in anxiety for maths, for boys and girls across countries") %>% col.names=kable_styling(latex_options="hold_position", position="center") %>%
+group_rows( "Finland", 1,2) %>%
+group_rows( "Norway", 3,4) %>%
+group_rows( "France", 5,6) %>%
+group_rows("Viet Nam", 7,8)
+
+meanfin2 <- c(0.23,-0.17)
+cifin2 <- c("[0.18;0.28]","[-0.22;-0.12]")
+meannor2 <- c(0.08,-0.27)
+cinor2 <- c("[0.02;0.13]","[-0.34;-0.21]")
+meanfr2 <- c(0.07,-0.39)
+cifr2 <- c("[0.02;0.13]","[-0.45;-0.34]")
+meanviet2 <- c(-0.09,-0.28)
+civiet2 <- c("[-0.13;-0.05]","[-0.31;-0.24]")
+
+table2.5.2<- rbind(meanfin2,cifin2,meannor2,cinor2,meanfr2,cifr2,meanviet2,civiet2)
+row.names(table2.5.2) <- c("Average score", "Confidence Interval","Average score", "Confidence Interval") %>%
+kable(table2.5.2, caption="Average values in self-assessment in maths, for boys and girls across countries") %>%
+kable_styling(latex_options="hold_position", position="center") %>%
+group_rows( "Finland", 1,2) %>%
+group_rows( "Norway", 3,4) %>%
+group_rows( "France", 5,6) %>%
+group_rows( "Viet Nam", 7,8)
+meanfin3 <- c(-0.21,-0.03)
+cifin3 <- c("[-0.26;-0.16]","[-0.09;0.02]")
+meannor3 <- c(0.05,0.27)
+cinor3 <- c("[0;0.1]","[0.23;0.31]")
+meanfr3 <- c(0.25,0.39)
+cifr3 <- c("[0.2;0.3]","[0.35;0.44]")
+meanviet3 <- c(0.04,0.14)
+civiet3 <- c("[0.01;0.08]","[0.1;0.18]")
+table2.5.3 <- rbind(meanfin3,cifin3,meannor3,cinor3,meanfr3,cifr3,meanviet3,civiet3)
+
+row.names(table2.5.3) <- c("Average score", "Confidence Interval","Average score", "Confidence Interval") %>%
+kable(table2.5.3, caption="Average values in attributions to failure in maths, for boys and girls across countries")%>% kable_styling(latex_options="hold_position", position="center") %>%
+group_rows( "Finland", 1,2) %>%
+group_rows( "Norway", 3,4) %>%
+group_rows( "France", 5,6) %>%
+group_rows( "Viet Nam", 7,8)
+```
+
+These are the steps involved in creating the function fun():
+
+* **Step 1**: Creates the function called “fun” and defines its arguments which are the variable and the data.
+* **Step 2**: The function meanrp computes the weighted mean of the variable using weightBRR as weights;the function is then replicated 80 times.
+* **Step 3**: The function sdrp calculates the standard deviation of the weighted means from Step 2 and is also replicated 80 times.
+* **Step 4**: The function meantot calculates the weighted mean of the variable using weightFinal.
+* **Step 5**: The function meanse calculates the standard deviation of the difference between meanrp and meantot.
+* **Step 6**: The functions LB and UB compute the lower and upper bounds of the estimated mean at the
+95% confidence level.
+* **Step 7**: The last function shows what should appear when running the function fun, which is the
+frequency, the mean, the standard error and the confidence interval using LB and UB.
+* **Step 8**: The final step is to show the results with 2 digits.
+
+
+This function’s underlying idea is to compute a weighted mean of a test score based on a variable which can be the answers to the subjective tests (such as self-assessment in maths level). It uses the method of replication (80 times in this case) for a unique variable and the weights the function takes are the Balanced Repeated Replication (BRR) weights.
+
+
+The function is used to compute the average values of three indices of self-assessment in mathematics for boys and girls. The three indices to be studied are:
+1. ANXMAT : A measure of Mathematics anxiety comprising questions like “Are you afraid to fail in a maths test?”. 
+2. SCMAT : A measure of self-concept in Mathematics with self-assessment statements like “I am generally good at maths”.
+3. FAILMAT : A measure of the attributions to failure in Mathematics.
+
+: Cross-country analysis of math anxiety in girls and boys
+
+| Country | Girls Avg. Score | Boys Avg. Score |
+| :----: | :----: |:----:| 
+| Finland| -0.13 | -0.52 |
+|        | [-0.17,-0.08] |[-0.56,-0.48]|
+| Norway | 0.2 | -0.16 |
+|       | [0.14,0.26] | [-0.21,-0.1] |
+| France | 0.49 | 0.05 |
+|        | [0.45,0.53] | [0,0.1] |
+| Vietnam | 0.27 | 0.15 |
+|       | [0.11,0.2] | [0.11,0.2] |
+
+: Cross-country analysis of attribution of math failure in girls and boys
+
+| Country | Girls Avg. Score | Boys Avg. Score |
+| :----: | :----: |:----:| 
+| Finland| -0.03 | -0.21 |
+|        | [-0.09,-0.02] |[-0.26,-0.16]|
+| Norway | 0.2 | -0.16 |
+|       | [0.23,0.31] | [0.0,-0.1] |
+| France | 0.39 | 0.25 |
+|        | [0.35,0.44] | [0.2,0.3] |
+| Vietnam | 0.14 | 0.04 |
+|       | [0.1,0.18] | [0.01,0.08] |
+
+
+: Cross-country analysis of self-assessment in maths for girls and boys
+
+| Country | Girls Avg. Score | Boys Avg. Score |
+| :----: | :----: |:----:| 
+| Finland| -0.17 | 0.23 |
+|        | [-0.22,-0.12] |[0.18,0.28]|
+| Norway | -0.27 | 0.08 |
+|       | [-0.34,-0.21] | [0.02,0.13] |
+| France | -0.39 | 0.07 |
+|        | [-0.45,-0.34] | [0.02,0.13] |
+| Vietnam | -0.28 | -0.09 |
+|       | [-0.31,-0.24] | [-0.13,-0.05] |
+
+
+Analysis of Math Anxiety : Here we observe that children from Finland, regardless of their sex, are the least anxious about math while children in France and Vietnam are more anxious. In norway we see a significant gender difference with girls being anxious while boys not being anxious about math. On average, girls appear to be more anxious than boys when it comes to math. 
+Analysis of Attribution of failure in Math : Here we observe that girls have higher values than boys, implying that they have a stronger belief that they will fail in math and they are more likely to attribute this failure to their internal skills. In Finland, students appear quite confident and do not perceive themselves as failing in math. 
+
+Analysis of Self-Assessment in Math : The gender differences are significant below the threshold of 5% significance level. On average, girls tend to have a more negative self-perception of their mathematical abilities than boys. Boys from Finland have the highest self-assessment of their math skills while it is interesting to note that Vietnamese boys have a negative self-perception. This could hint that Vietnam might have similar cultural norms as other Asian countries such as China, Singapore, India where the boys have immense social pressure to excel in academics and ultimately get prestigious high paying jobs to provide for the family.  
+
+To conclude, we know that what a student learns in class is not solely dependent on the content of the lessons and the teaching methodology. Individual behavioral and general societal conditions and attitudes greatly impact a student's ability to learn effectively in a classroom.Thus, while financial resources, capital and effective teacher training are important aspects of an education policy, more subtle variables like gender disparities, socio-economic inequalities, self-confidence and mental health should not be ignored. 
