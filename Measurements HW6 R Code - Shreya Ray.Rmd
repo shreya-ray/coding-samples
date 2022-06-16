@@ -865,3 +865,6 @@ Analysis of Attribution of failure in Math : Here we observe that girls have hig
 Analysis of Self-Assessment in Math : The gender differences are significant below the threshold of 5% significance level. On average, girls tend to have a more negative self-perception of their mathematical abilities than boys. Boys from Finland have the highest self-assessment of their math skills while it is interesting to note that Vietnamese boys have a negative self-perception. This could hint that Vietnam might have similar cultural norms as other Asian countries such as China, Singapore, India where the boys have immense social pressure to excel in academics and ultimately get prestigious high paying jobs to provide for the family.  
 
 To conclude, we know that what a student learns in class is not solely dependent on the content of the lessons and the teaching methodology. Individual behavioral and general societal conditions and attitudes greatly impact a student's ability to learn effectively in a classroom.Thus, while financial resources, capital and effective teacher training are important aspects of an education policy, more subtle variables like gender disparities, socio-economic inequalities, self-confidence and mental health should not be ignored. 
+
+
+### Appendix : 

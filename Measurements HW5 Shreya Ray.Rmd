@@ -1,0 +1,486 @@
+---
+title: 'Measurement of Policy Outcomes HW5 : Labour'
+author: "Shreya RAY"
+date: "16/11/2020"
+output:
+  pdf_document: default
+  word_document: default
+  bibliography: bibliography.bibtex
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+####Analyzing the French Labour Force : 
+
+*The data lfshwk fr11.dta and lfshwk fr12.dta are excerpts from the 2011 and 2012 French Labor Force Survey (LFS). It covers the population of people, aged 15 years or more, living in households in metropolitan France in 2011 and 2012. The LFS has over 100 variables of which only a subset is required for this homework. The Annex presents the list of variables used for this homework and and their description. Furthermore, binary and categorial variables are labelled. This means that to each value of a given variable is attached its corresponding label. Hence the variable sexe has two values 1 and 2 which are respectively labelled “1.Male” and “2.Female”. Also note that some variables are numbers that are stored in string format. The main weight variable to be used for your computations is called weight. It is an individual weight and gives the number of persons living in France that each person interviewed represents. Individuals who refused to participate to the survey were given 0 as weight. The goal of this homework is to think about the definitions, measurement and concrete implementation of two concepts: the labor force and unemployment.*
+
+**Questions :**
+
+**1) Recall the concepts of employment, unemployment and inactivity. Base yourself on the recommendations of the International Labour Organization, and especially the resolutions of the 13th Conference of Labour Statisticians. Define the labor force participation rate, and the unemployment rate. (1 point)**
+
+*Defining Concepts of Labour Force* 
+
+a) Labour Force : 
+
+According to the 13th International Convention of Labour Statisticians (October 1982), the term labour force (economically active population) refers to “ all persons who fulfil the requirements for inclusion among the employed or the unemployed ” . Accordingly, the ILO defines the labour force participation rate (LFPR) as the number of persons who are active participants of the labour market or are actively looking for employment as a percentage of the total working-age population. 
+
+$$LFPR = \frac{(Employed + Unemployed)}{Working Age Population}$$
+
+b) Working-Age Population :
+
+In order to foster international comparisons, the ILO comprises the working age population as the population that is 15 years and above and to whom economic inquiry is made. The working age population comprises the total labour force (economically active) and those who fall outside the labour force (potential labour force). This latter category of individuals are also referred to as the economically inactive population.
+
+$$Working Age Population = Total Economically Active Population + Economically Inactive Population$$ 
+
+c) Employment :
+
+An employed person is one who is above a specified age  and who, during a brief specified reference period, performed some work, for a minimum of 1 hour, and received a wage or salary for it. S/he must fall in one of the following categories :
+* Paid employment : either “at work” or “with a job but not at work”
++ At work : Person performed some work during the reference period in exchange for a wage or salary. 
++ With job but not at work : Person has already worked at a  job but was temporarily not at work during the reference period but has a formal attachment to the job. 
+* Self-employment : either “at work” or “with an enterprise but not at work” 
++ At work : Person who during the reference period performed some work for profit or family gain, in cash or in kind. 
++ With an enterprise but not at work : Person with an enterprise, which may be a business enterprise, a farm or a service undertaking, who was temporarily not at work during the reference period for any specific reason.
+
+d) Unemployment : 
+
+According to the ILO, the unemployed are those persons who are of legal working age and fulfil all the three following criteria: 
+* They have not worked (either paid work or self-employed work) for atleast 1 hour in the reference period. 
+* They are actively seeking employment since the past one month or having found employment that starts within the next 3 months.  
+* They are available to take up employment within the next two weeks if provided with a job opportunity. 
+
+The unemployment rate is measured as the number of unemployed persons as a percentage of the total number of persons in the labour force. 
+
+$$UR = (\frac{total no. of persons unemployed}{total labour force}) * 100$$
+
+**2)  In light of the definitions of the International Labor Organization and the INSEE, compute what you think are the “official”employment rate (employment-to-population rate) and unemployment rate in France in 2011 and 2012. Explain your computations. (4 pts)**
+
+
+*Computing Employment & Unemployment Rates*
+
+```{r, include=FALSE}
+
+#### list of packages 
+library(haven)
+library(tidyverse)
+library(dplyr)
+
+#### load datasets
+df11 <- read_dta("C:/Users/Shreya/Downloads/lfshwk_fr11.dta")
+View(df11)
+df12 <- read_dta("C:/Users/Shreya/Downloads/lfshwk_fr12.dta")
+View(df12)
+
+
+
+#Question 2 : calculate official employment and unemployment rates in France 
+
+#We are fixing the working-age population as all those who are 15 years and above :
+summary(df$ag) #the min age is already 15 and max age is 99. no need to subset the data.
+
+df11$empl <- ifelse((df11$traref==1 & !is.na(df11$traref==1))|(df11$aidref==1 & df11$traref==2 & !is.na(df11$aidref==1 & df11$traref==2))| (df11$aidref==4 & df11$traref==2 & !is.na(df11$aidref==4 & df11$traref==2))| (df11$natstg==1 & df11$traref==2 & !is.na(df11$natstg==1 & df11$traref==2))| (df11$ag >= 75 & df11$temp ==1 & !is.na(df11$ag >= 75 & df11$temp ==1)) | (df11$rabs==1 & !is.na(df11$rabs==1)) | (df11$rabs==2 & df11$rabsp<= 365 & !is.na(df11$rabs==2 & df11$rabsp<= 365))|(df11$rabs==3 & !is.na(df11$rabs==3)) | (df11$rabs==4 & !is.na(df11$rabs==4)) | (df11$rabs==5 & df11$rabsp<=91 & !is.na(df11$rabs==5 & df11$rabsp<=91)) | (df11$rabs==6 & df11$rabsp<=91 & !is.na(df11$rabs==6 & df11$rabsp<=91)) | (df11$rabs==7 & !is.na(df11$rabs==7)) | (df11$rabs==8 & !is.na(df11$rabs==8)) | (df11$rabs==10 & !is.na(df11$rabs==10)), 1, 0)
+summary(df11$empl) #there are no NAs. The employment to population rate is the mean = 52.16%
+
+df12$empl <- ifelse((df12$traref==1 & !is.na(df12$traref==1))|(df12$aidref==1 & df12$traref==2 & !is.na(df12$aidref==1 & df12$traref==2))| (df12$aidref==4 & df12$traref==2 & !is.na(df12$aidref==4 & df12$traref==2))| (df12$natstg==1 & df12$traref==2 & !is.na(df12$natstg==1 & df12$traref==2))| (df12$ag >= 75 & df12$temp ==1 & !is.na(df12$ag >= 75 & df12$temp ==1)) | (df12$rabs==1 & !is.na(df12$rabs==1)) | (df12$rabs==2 & df12$rabsp<= 365 & !is.na(df12$rabs==2 & df12$rabsp<= 365))|(df12$rabs==3 & !is.na(df12$rabs==3)) | (df12$rabs==4 & !is.na(df12$rabs==4)) | (df12$rabs==5 & df12$rabsp<=91 & !is.na(df12$rabs==5 & df12$rabsp<=91)) | (df12$rabs==6 & df12$rabsp<=91 & !is.na(df12$rabs==6 & df12$rabsp<=91)) | (df12$rabs==7 & !is.na(df12$rabs==7)) | (df12$rabs==8 & !is.na(df12$rabs==8)) | (df12$rabs==10 & !is.na(df12$rabs==10)), 1, 0)
+summary(df12$empl)
+
+EPR_2011 <- lm(df11$empl ~1, weight=df11$weight)
+summary(EPR_2011) #54.57%
+EPR_2012 <- lm(df12$empl ~1, weight=df12$weight)
+summary(EPR_2012) #54.33%
+
+#Unemployment Rate
+#create unemployment variable 
+
+df11$unempl <- ifelse((df11$traref==2 & !is.na(df11$traref==2) & df11$dispoc==1 & !is.na(df11$dispoc==1) & df11$dem==1 & !is.na(df11$dem==1) & df11$pastra==2 & !is.na(df11$pastra==2))|(df11$traref==2 & !is.na(df11$traref==2) & df11$dispoc==1 & !is.na(df11$dispoc==1) & df11$dem==1 & !is.na(df11$dem==1) & df11$pastra==1 & !is.na(df11$pastra==1) & (df11$rabs==9 & !is.na(df11$rabs==9)|df11$rabs==11 & !is.na(df11$rabs==11)))|(df11$tafref==2 & !is.na(df11$traref==2) & df11$dem==1 & !is.na(df11$dem==1) &df11$pastrb==1 & !is.na(df11$pastrb==1) & df11$ultj>14 & !is.na(df11$ultj>14))| (df11$traref==2 & !is.na(df11$traref==2) & df11$dem==1 & !is.na(df11$dem==1) & df11$dispoc==2 & !is.na(df11$dispoc==2) & df11$nondic==6 & !is.na(df11$nondic==6))|(df11$traref==2 & !is.na(df11$traref==2) & df11$dem==1 & !is.na(df11$dem==1) & df11$dispoc==2 & !is.na(df11$dispoc==2) & df11$pastra==1 & !is.na(df11$pastra==1) & df11$rabs==2 & !is.na(df11$rabs==2) & df11$rabsp>365 & !is.na(df11$rabsp>365)) | (df11$traref==2 & !is.na(df11$traref==2) & df11$dem==1 & !is.na(df11$dem==1) & df11$dispoc==2 & !is.na(df11$dispoc==2) & df11$pastra==1 & !is.na(df11$pastra==1) & df11$rabs==5 & !is.na(df11$rabs==5) & df11$rabsp>91 & !is.na(df11$rabsp>91)) | (df11$traref==2 & !is.na(df11$traref==2) & df11$dem==1 & !is.na(df11$dem==1) & df11$dispoc==2 & !is.na(df11$dispoc==2) & df11$pastra==1 & !is.na(df11$pastra==1) & df11$rabs==6 & !is.na(df11$rabs==6) & df11$rabsp>91 & !is.na(df11$rabsp>91)), 1, 0)
+
+df12$unempl <- ifelse((df12$traref==2 & !is.na(df12$traref==2) & df12$dispoc==1 & !is.na(df12$dispoc==1) & df12$dem==1 & !is.na(df12$dem==1) & df12$pastra==2 & !is.na(df12$pastra==2))|(df12$traref==2 & !is.na(df12$traref==2) & df12$dispoc==1 & !is.na(df12$dispoc==1) & df12$dem==1 & !is.na(df12$dem==1) & df12$pastra==1 & !is.na(df12$pastra==1) & (df12$rabs==9 & !is.na(df12$rabs==9)|df12$rabs==11 & !is.na(df12$rabs==11)))|(df12$tafref==2 & !is.na(df12$traref==2) & df12$dem==1 & !is.na(df12$dem==1) &df12$pastrb==1 & !is.na(df12$pastrb==1) & df12$ultj>14 & !is.na(df12$ultj>14))| (df12$traref==2 & !is.na(df12$traref==2) & df12$dem==1 & !is.na(df12$dem==1) & df12$dispoc==2 & !is.na(df12$dispoc==2) & df12$nondic==6 & !is.na(df12$nondic==6))|(df12$traref==2 & !is.na(df12$traref==2) & df12$dem==1 & !is.na(df12$dem==1) & df12$dispoc==2 & !is.na(df12$dispoc==2) & df12$pastra==1 & !is.na(df12$pastra==1) & df12$rabs==2 & !is.na(df12$rabs==2) & df12$rabsp>365 & !is.na(df12$rabsp>365)) | (df12$traref==2 & !is.na(df12$traref==2) & df12$dem==1 & !is.na(df12$dem==1) & df12$dispoc==2 & !is.na(df12$dispoc==2) & df12$pastra==1 & !is.na(df12$pastra==1) & df12$rabs==5 & !is.na(df12$rabs==5) & df12$rabsp>91 & !is.na(df12$rabsp>91)) | (df12$traref==2 & !is.na(df12$traref==2) & df12$dem==1 & !is.na(df12$dem==1) & df12$dispoc==2 & !is.na(df12$dispoc==2) & df12$pastra==1 & !is.na(df12$pastra==1) & df12$rabs==6 & !is.na(df12$rabs==6) & df12$rabsp>91 & !is.na(df12$rabsp>91)), 1, 0)
+
+
+#calculate unemployment rate 
+UR_2011 <- lm(df11$unempl[df11$empl==1|df11$unempl==1]~1, weight=df11$weight[df11$empl==1|df11$unempl==1])
+summary(UR_2011) #8.486%
+
+UR_2012 <- lm(df12$unempl[df12$empl==1|df12$unempl==1]~1, weight=df12$weight[df12$empl==1|df12$unempl==1])
+summary(UR_2012) #9.071%
+```
+
+We are using data from the French Continuous Labour Force Survey for 2011 and 2012. The short reference period is fixed at 4 weeks and the minimum working-age is found to be 15 years. To comply with ILO protocols, We will not keep any upper-bound for the working age. In a world where the global life expectancy is rising and the young working age population is increasingly choosing higher education instead of jobs, it can be argued that the older population is working for more number of years than before.
+
+While computing indicators related to the labour market, it is vital to avoid double counting by following line of precendence :
+- Step 1 : Calculate the Employed 
+- Step 2 : Calculate the Unemployed 
+- Step 3 : Calculate the Economically Inactive 
+
+*The hierarchy is : Employment > Unemployment > Inactive* 
+
+
+* Step 1 : Employment to Population Rate 
+According to the ILO, the official employment to population ratio is defined as that proportion of a country’s working-age population that is employed. The definition of employment remains the same as that provided in answer 1. 
+
+$$EPR = (\frac{Employed}{Working Age Pop}) * 100$$
+
+The variables we shall require for the dummy variable empl are the following :
+
+a) At work :
++ traref = 1 (done any paid work in the reference period. NAs show that it excludes those above 75 years of age)
++ temp = 1 (employed but over 75 years of age)
++ aidref = 1,2,4 (unpaid work during reference period for relative's business, internship or family care)
+
+b) Not at work:
++ rabs = all values except 9 and 11 (valid reasons for temporary absence from work )
+
+: Table 1. Employment to Pop Rate %
+|   |  2011 | 2012 |
+|:---:|:---:|:---:|
+| EPR % | 54.576*** | 54.332***|
+|  se | (0.001)| (0.001)|
+
+* Step 2 : Unemployment Rate 
+As discussed above, a person must satisfy all three criteria for unemployment to be classified as unemployed.
+* Have not done any paid or unpaid work for even an hour in the reference period. 
+* Are actively seeking employment 
+* Are currently available to start work within 2 weeks
+
+Exceptions to the rule are :
++ Those whose future start dates of their jobs are after the reference period and are currently available to work. They are deemed unemployed. 
++ Those who are unavailable to work due to long-term illness/disability are deemed unemployed. 
++ Those who are not at work because they have been sick/injured for more than 365 days are deemed unemployed.
++ Those who are not at work because they are on parental leave or other unpaid leave for more than 91 days are deemed unemployed.
++ Those who have been indefinitely laid off or are waiting to start a new job are deemed unemployed. 
+
+$$UR = (\frac{Total Unemployed}{Labour Force}) * 100$$
+
+: Table 2 Unemployment Rate 
+|    | 2011 | 2012 |
+|:---:|:---:|:---:|
+| UR % | 8.486*** | 9.071*** |
+| se | (0.001) | (0.001) |
+
+In Table 1 and Table 2 we can see a rise in unemployment rate from approx 8.49% to 9.07% and very small decline in employment to population rate.
+
+* Step 3 : Economically Inactive
+The remaining share of the working-age population is deemed economically inactive. 
+
+**3) Discuss this definition of unemployment and offer your own definition, by emphasizing what seems to be more relevant. Note: Be concise. Your answer should contain less than 400 words. (3 pts)**
+
+There are three verticals through which the definition of unemployment can be further enhanced.
+
+*a) Accounting for economically inactive*
+
+As we now know, the working age population is made up of three important categories:
+1.	The total no. of employed persons
+2.	The total no. of unemployed persons
+3.	The total potential labour force 
+
+The potential labour force is further broken into :
+* Those who are unavailable to work but are seeking jobs 
+* Those who are available to work but are not seeking jobs
+
+The first two categories add up to the total labour force and the third is the total economically inactive population. I believe it is important to account for this third category while computing unemployment rates. It gives us an idea of those who could have been employed but were discouraged from the lack of opportunities. 
+
+
+*b) Reviewing Existing Variables*
+
+* The necessary criteria "must be actively seeking employment" is misleading as in the real world people rely on informal information channels to be aware of the current labour market. Even though a person may not explicitly appear to be actively seeking employment, she may already know what jobs are available and what aren't. So, we could do away with this criteria. 
+* The criteria "must be available to work within 2 weeks" could be increased to 3 weeks to accommodate those who are unavailable due to temporary reasons like sickness or family responsibilities. Work for the household to be included as employment.
+*	Taking temporary leave to take care of family members without pay should be included as a employment. It allows us to include unpaid household labour which is pre-dominantly carried out by women. 
+*	All kinds of internships either paid or unpaid could be included as employment as gaining skills of any kind could contribute towards future employment.
+
+*c) Including More Variables*
+
+*	Unemployment should not be looked as just a binary concept. It is essential to differentiate between short term unemployment and long term chronic unemployment. The latter is a worrying feature of the economy. 
+*	We must reflect on what we aim to achieve to by measuring the unemployment rate. To make the indicator more representative of the health of the economy we could include measures for low income, low productivity, social security coverage, conditions at work and job satisfaction.
+
+*d) Calculating New Unemployment :*
+
+Adding two more types of unemployment to the existing definition: 
+1. Unavailable job-seeker : In the dataset this corresponds to the variable (traref=2 & dispoc=2 & dem=1 & pastra=2) 
+2. Available potential job-seeker : In the dataset this corresponds to the variable (traref=2 & dispoc=1 & dem=2 & pastra=2)
+
+This results in an enormous unemployment rate which is much larger than the previous unemployment rate. It is possible that I must add more caveats to make the rate better defined and usable. 
+
+
+**4) Assume that the LFS sample was drawn randomly (you can thus forget about weights for this question). What is the standard error of the estimated unemployment rate (computed in question b)? Comment. (3 points)**
+
+The standard error of an estimate measures how far the average sample estimate from the true average population estimate. It gives us the accuracy of the sample statistic. 
+
+$$Std.Error = \frac{\sigma}{\sqrt{n}}$$
+
+*Where $\sigma$ = sample standard deviation* 
+
+```{r, include=FALSE}
+#Calculating Standard Errors of the estimated unemployment rate (calculated in ques 2)
+unempl_unw_2011 <- lm(df11$unempl[df11$empl==1 | df11$unempl==1]~1)
+summary(unempl_unw_2011) #s.e. 0.0005688
+unempl_unw_2012 <- lm(df12$unempl[df12$empl==1 | df12$unempl==1]~1)
+summary(unempl_unw_2012) #s.e. 0.0005815
+```
+
+:Table 3. Regression Coefficients for 2011
+
+|         | Estimate Std.Error | t value | Pr(>|t|) |
+| :----: | :----: | :----: | :----: | :----: |
+|(Intercept)| 0.0846122 | 0.0005688 | 148.8 | <2e-16 *** |
+
+:Table 4. Regression Coefficients for 2012 
+
+|         | Estimate Std. Error | t value | Pr(>|t|) |
+| :----: | :----: | :----: | :----: | :----: |
+|(Intercept)| 0.0886309  | 0.0005815 |  152.4 | <2e-16 *** |
+
+Table 3 and Table 4 show us that the standard error for the estimated unweighted unemployment rate is 0.001 which is indeed very low. This gives us confidence that the estimated unemployment rate is representative of the true population unemployment rate. 
+
+
+**5) Using both the lfshwk fr12.dta and lfshwk fr11.dta datasets, analyze the evolution of the structure of  the working-age population in terms of work status (employment, unemployment, inactivity):**
+**- between quarter 1, 2011 and quarter 2, 2011**
+**- between quarter 2, 2011 and quarter 3, 2011**
+**- between quarter 1, 2012 and quarter 2, 2012**
+**Comment. (4 pts)**
+
+```{r, include = FALSE}
+# Question 5 : Looking at evolution of Working Age Population :
+
+# We already have unemplpoyment and employment figures. Need to create variable that captures inactivity. 
+
+#create dummy variable for inactive = 1 if person is not employed and not unemployed
+df11$inact <- ifelse(df11$empl==0 & df11$unempl==0, 1, 0)
+summary(df11$inact)
+df12$inact <- ifelse(df12$empl==0 & df12$unempl==0, 1, 0)
+summary(df12$inact)
+
+#create quarters for 2011 and 2012 
+df11$q1 <- ifelse(df11$datcoll>=20110101&df11$datcoll<=20110331, 1, 0)
+df11$q2 <- ifelse(df11$datcoll>=20110401&df11$datcoll<=20110631, 1, 0)
+df11$q3 <- ifelse(df11$datcoll>=20110701&df11$datcoll<=20110931, 1, 0)
+df11$q4 <- ifelse(df11$datcoll>=20111001&df11$datcoll<=20111231, 1, 0)
+
+df12$q1 <- ifelse(df12$datcoll>=20110101&df12$datcoll<=20110331, 1, 0)
+df12$q2 <- ifelse(df12$datcoll>=20120401&df12$datcoll<=20110631, 1, 0)
+df12$q3 <- ifelse(df12$datcoll>=20120701&df12$datcoll<=20110931, 1, 0)
+df12$q4 <- ifelse(df12$datcoll>=20121001&df12$datcoll<=20111231, 1, 0)
+
+#create employment, unemployment, inactive shares for each quarter in 2011
+empl_q1_2011 <- lm(df11$empl[df11$q1==1]~1, weights = df11$weight[df11$q1==1]) 
+empl_q2_2011 <- lm(df11$empl[df11$q2==1]~1, weights = df11$weight[df11$q2==1]) 
+empl_q3_2011 <- lm(df11$empl[df11$q3==1]~1, weights = df11$weight[df11$q3==1]) 
+empl_q4_2011 <- lm(df11$empl[df11$q4==1]~1, weights = df11$weight[df11$q4==1]) 
+
+unempl_q1_2011 <- lm(df11$unempl[df11$q1==1]~1, weights = df11$weight[df11$q1==1]) 
+unempl_q2_2011 <- lm(df11$unempl[df11$q2==1]~1, weights = df11$weight[df11$q2==1]) 
+unempl_q3_2011 <- lm(df11$unempl[df11$q3==1]~1, weights = df11$weight[df11$q3==1]) 
+unempl_q4_2011 <- lm(df11$unempl[df11$q4==1]~1, weights = df11$weight[df11$q4==1]) 
+
+inact_q1_2011 <- lm(df11$inact[df11$q1==1]~1, weights = df11$weight[df11$q1==1])
+inact_q2_2011 <- lm(df11$inact[df11$q2==1]~1, weights = df11$weight[df11$q2==1])
+inact_q3_2011 <- lm(df11$inact[df11$q3==1]~1, weights = df11$weight[df11$q3==1])
+inact_q4_2011 <- lm(df11$inact[df11$q4==1]~1, weights = df11$weight[df11$q4==1])
+
+#create employment, unemployment, inactive shares for each quarter in 2012 
+empl_q1_2012 <- lm(df12$empl[df12$q1==1]~1, weights = df12$weight[df12$q1==1]) 
+unempl_q1_2012 <- lm(df12$unempl[df12$q1==1]~1, weights = df12$weight[df12$q1==1]) 
+inact_q1_2012 <- lm(df12$inact[df12$q1==1]~1, weights = df12$weight[df12$q1==1]) 
+
+empl_q1_2012 <- lm(df12$empl[df12$q1==1]~1, weights = df12$weight[df12$q2==1]) 
+unempl_q1_2012 <- lm(df12$unempl[df12$q1==1]~1, weights = df12$weight[df12$q2==1]) 
+inact_q2_2012 <- lm(df12$inact[df12$q2==1]~1, weights = df12$weight[df12$q2==1])
+```
+
+:Table 5. Description of WP (2011)
+
+| Category | Q1 | Q2 | Q3 | Q4 |
+| :----: | | :----: | :----: | :----:| :----: |
+| Unemployment | 0.058*** | 0.054*** | 0.036*** | 0.058***| 
+|  (std.err) | (0.001)   | (0.001)  | (0.001)  | (0.001) |
+| Employment | 0.598*** | 0.607*** | 0.610*** | 0.604*** |
+| (std.err)  |  (0.002) | 0.002) | (0.002) | (0.002) | 
+| Inactive | 0.348*** | 0.343*** | 0.339*** | 0.340*** |
+| (std.err) | (0.002) | (0.002) | (0.002) | (0.002) |
+
+* Summary of Table 5 
++ In 2011, unemployment fell marginally from Q1 to Q2 and fell more significantly from Q2 to Q3 but significantly rose back in Q4 to the same level as Q1.
++ In 2011, employment rose from Q1 to Q2 and rose marginally again from Q2 to Q3 and then fell slightly from Q3 to Q4
++ In 2011, the economically inactive population fell consistently from Q1 to Q2 to Q3 and rose very slightly in Q4. More or less the rate of inactive has remained stable. 
+
+* Analysis of Table 5 
++ The above trends beg the questions that why has the share of inactive population remained consistent while unemployment has falled and employment has rise in certain quarters? It could be that there is a time lag for the labour market to absorb the new jobs and thus if we compare only Q1 and Q4 we can see a slight drop in inactive persons. But this fall is very small. 
+
++ It is also interesting to note that though there is a substantial fall in unemployment from Q2 to Q3, this isn't matched with a similar rise in employment. Further analysis could be undertaken to check whether these trends imply a seasonal variation in the labour market.  
+
+
+:Table 6. Description of WP (2012)
+
+| Category | Q1 | Q2 |
+| :----: | | :----: | :----: |
+| Unemployment | 0.0613*** | 0.0575*** 
+|  (std.err) | (0.001)   | (0.001)  
+| Employment | 0.596*** | 0.605*** |
+| (std.err)  |  (0.002) | 0.002) | 
+| Inactive | 0.345*** | 0.341*** | 
+| (std.err) | (0.002) | (0.002) | 
+
+* Summary of Table 6
++ In 2012, unemployment fell slightly from Q1 to Q2.
++ In 2012, employment rose significantly from Q1 to Q2.
++ In 2012, economically inactive population fell slightly from Q1 to Q2.
+
+* Analysis of Table 6
++ In 2012 once again we see unemployment falling, employment rising and inactivity falling from the first quarter to the second. It would be interesting to further look at the third and fourth quarters of 2012 to get a sense of seasonal variations in the labour market. 
++ In 2012 one again we can see a stable rate of the economically inactive population. This could indicate a need for policy interventions to study whether there is a sizable discouraged worker effect. 
+
+
+**6) Using the official definition of unemployment rate and labor force participation, comment on the differences that you are able to observe for this rate in 2012 by gender, age and highest qualification held. (5 pts) Note: Be concise. Your answer should contain less than 500 words.**
+
+
+```{r, include=FALSE}
+
+# Question 6 : Cross-Cutting Analysis of Unemployment and Labour Force Participation in 2012 segragated by Age Education & Gender
+
+## for the unemployment rate dividied by age, education and gender, we need to calculate the no. of unemployed persons in each category and divide that by the total labour force in that category. 
+
+## No. of unemployed persons by each category :
+
+#Create variables for unemployed by Ages : old (old), young (y), middle age (mid)
+unempl_old <- lm(df12$unempl[df12$ag>55 & (df12$empl==1|df12$unempl==1) & df12$ddipl==1]~1, weight=df12$weight[df12$ag>55 & (df12$empl==1|df12$unempl==1) & df12$ddipl==1])
+unempl_y <- lm(df12$unempl[df12$ag<26 & (df12$empl==1|df12$unempl==1) & df12$ddipl==1]~1, weight=df12$weight[df12$ag<26 & (df12$empl==1|df12$unempl==1) & df12$ddipl==1])
+unempl_mid <- lm(df12$unempl[df12$ag<56 & df12$ag>25 & (df12$empl==1|df12$unempl==1) & df12$ddipl==1]~1, weight=df12$weight[df12$ag<56 & df12$ag>25 & (df12$empl==1|df12$unempl==1) & df12$ddipl==1])
+summary(unempl_old)
+summary(unempl_y)
+summary(unempl_mid)
+
+#Create variables for unemployed by Education : highest (H_edu) and lowest (L_edu)
+unempl_H_edu <- lm(df12$unempl[(df12$empl==1|df12$unempl==1) & df12$ddipl==1]~1, weight=df12$weight[(df12$empl==1|df12$unempl==1) & df12$ddipl==1]) 
+unempl_L_edu <- lm(df12$unempl[(df12$empl==1|df12$unempl==1) & df12$ddipl==7]~1, weight=df12$weight[(df12$empl==1|df12$unempl==1) & df12$ddipl==7])
+summary(unempl_H_edu)
+summary(unempl_L_edu)
+
+#Create variables for unemployed by Gender : male (m) and female (f)
+unempl_m <- lm(df12$unempl[(df12$empl==1|df12$unempl==1) & df12$sexe==1]~1, weight=df12$weight[(df12$empl==1|df12$unempl==1) & df12$sexe==1])
+unempl_f <- lm(df12$unempl[(df12$empl==1|df12$unempl==1) & df12$sexe==2]~1, weight=df12$weight[(df12$empl==1|df12$unempl==1) & df12$sexe==2])
+summary(unempl_m)
+summary(unempl_f)
+
+## Labour Force Participation Rate by each category :
+
+#create dummy variable for labour force (LF = 1) defined as those who are economically active
+df12$LF <- ifelse(df12$inact==0, 1, 0)
+
+# create variable for labour force by Age (old, middle, young)
+LF_old <- lm(df12$LF[df12$ag>55 & df12$ddipl==1]~1, weight=df12$weight[df12$ag>55 & df12$ddipl==1])
+LF_y <- lm(df12$LF[df12$ag<25 & df12$ddipl==1]~1, weight=df12$weight[df12$ag<25 & df12$ddipl==1])
+LF_mid <- lm(df12$LF[df12$ag<56 & df12$ag>24 & df12$ddipl==1]~1, weight=df12$weight[df12$ag<56 & df12$ag>24 & df12$ddipl==1])
+summary(LF_old)
+summary(LF_mid)
+summary(LF_y)
+
+# create variable for labour force by Education (highest, lowest)
+LF_h <- lm(df12$LF[df12$ddipl==1]~1, weight=df12$weight[df12$ddipl==1])
+LF_l <- lm(df12$LF[df12$ddipl==7]~1, weight=df12$weight[df12$ddipl==7])
+summary(LF_h)
+summary(LF_l)
+
+# create variable for labour force by Gender (male, female)
+LF_m <- lm(df12$LF[df12$sexe==1]~1, weight=df12$weight[df12$sexe==1])
+LF_f <- lm(df12$LF[df12$sexe==2]~1, weight=df12$weight[df12$sexe==2])
+summary(LF_m)
+summary(LF_f)
+```
+
+:Table 7. Unemployment by Gender, Education, Age in 2012
+
+|Parameter|Unemployment Rate %|
+| :----: | :----: | 
+| Gender |
+| Female | 8.966 |
+|         | (0.001) |
+| Male | 9.173 | 
+|      | (0.001) |
+| Education |
+| High Level | 5.159 | 
+|           | (0.001)|
+| Low Level | 1.510 |
+|           |(0.002) |
+| Age |
+| Old (above 55) | 3.34 |
+|                | (0.01)|
+| Middle (55-25) | 4.86 |
+|                | (0.001) |
+| Young(below 25) | 12.43 |
+|                 |  (0.01) | 
+
+
+* Analysis of Table 7 
+
++ Gender :
+We see that the unemployment rate is not too different for women and men in 2012. This could signify that gender doesn't play a major role in a worker not getting job or a worker getting fired. 
+
++ Education :
+We see large difference in unemployment rates between those who have high education (51.59%) and those who have low education (15.10%). This could signify lower returns to higher education due to an excess of high skilled labour supply and a lack of high-skilled jobs to absorb this labour. It could be interesting to further analyse the rate of growth of France and determine whether it is a case of job less growth. WE could further analyse instances of social unrest or brain drain due to an excess of skilled human capital. 
+
++ Age 
+The unemployment rate is highest by a large margin for the young at 12.43%. This is followed by the middle-age group and then the old work force. The difference between middle-age and old-age unemployment doesn't appear to be large. The high unemployment rate for the young could be analysed in tandem with the high unemployment rate for the highly educated. It appears that the young and highly educated population is faced with a dearth of jobs to match their skills. This could signal an economy that is moving towards lower innovation and thus lower labour productivity.
+
+
+:Table 8. Labour Force Participation Rate by Gender, Education, Age 2012
+
+|Parameter|LFPR %|
+| :----: | :----: | 
+| Gender |
+| Female | 55.499 |
+|         | (0.001) |
+| Male | 63.470 | 
+|      | (0.001) |
+| Education |
+| High Level | 79.641 | 
+|           | (0.001)|
+| Low Level | 36.742 |
+|           |(0.001) |
+| Age |
+| Old (above 55) | 43.661|
+|                | (0.004)|
+| Middle (55-25) | 93.658|
+|                | (0.001) |
+| Young(below 25) | 51.012 |
+|                 |  (0.01) | 
+
+* Analysis of Table 8
+
++ Gender
+We see a significant difference in LFPR between women and men which exemplifies gender unequal labour market. This is quite interesting as the unemployment rate between the two have a narrow difference but the LFPR is considerably different. This could indicate that while there is gender parity while firing workers there is still gender inequality while hiring workers. 
+
++ Education
+The highly educated account for a larger share of the labour force than the less educated. However, we saw that the unemployment rates are also higher for the highly educated. This might mean that despite the current low returns to high education, young people are still investing in education and actively participating in the labour force. 
+
++ Age 
+Unsurprisingly, we see that the highest labour force participation rate is for the middle-age followed by the young and then the old. It is note-worthy that the share of the old-age labour force is quite significant and should not be discounted in calculations of the working-age population. This could mean that we are moving towards an economy in which people work for more number of years and more people work in their senior years. 
+
+### Appendix 
+```{r, ref.label=knitr::all_labels(),echo=TRUE,eval=FALSE}
+```
+
+
+# References
+
+@misc{insee_2022, title={Enqu?te emploi en continu EEC}, url={https://www.insee.fr/fr/metadonnees/source/serie/s1223}, journal={Insee}, year={2022}} 
+ 
+  @misc{insee, title={France, Portrait Social?dition 2019}, url={https://www.insee.fr/fr/statistiques/4238387?sommaire=4238781#documentation}, journal={Insee}} 
+  
+   @misc{dixte_do_minni_rebi?re_rey_(insee)_sophie de waroquier de puel parlan (insee)_2019, title={Emploi, ch?mage et population active en 2018}, url={https://dares.travail-emploi.gouv.fr/publications/emploi-chomage-et-population-active-en-2018}, journal={Dares}, author={Dixte, Christophe and Do, Thi-Phuong-Thuy and Minni, Claude and Rebi?re, Simon and Rey, Marie and (Insee), Christelle De Miras and Sophie De Waroquier de Puel Parlan (Insee)}, year={2019}, month={Jul}} 
+   
+    @misc{international training compendium on labour statistics_2013, url={https://www.ilo.org/global/statistics-and-databases/WCMS_210299/lang--en/index.htm}, journal={International training compendium on labour statistics}, year={2013}, month={Apr}} 
+    
+@MISC{ilostat,
+  title        = "{ILOSTAT} data tools to find and download labour statistics",
+  booktitle    = "{ILOSTAT}",
+  abstract     = "Get labour statistics from our comprehensive database with a
+                  tool that works for you. All tools provide free and open
+                  access to our data.",
+  howpublished = "\url{https://ilostat.ilo.org/data/.}",
+  note         = "Accessed: 2022-6-16",
+  language     = "en"
+}
+
+     
