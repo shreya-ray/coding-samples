@@ -8,17 +8,16 @@ output:
   pdf_document: default
 ---
 
-#####**Exercise I. Education in France : 10 points**
+# **Exercise I. Education in France : 10 points**
 
 *The dataset panel97.dta is an excerpt from the 1997 panel of French primary school pupils. It contains 9641 observations, 1 for each pupil. French primary school normally lasts 5 years, from age 6 to age 11. The first to fith grades are called, respectively, “cp”, “ce1”, “ce2”, “cm1” and “cm2” (literally, “preparatory course”, “elementary course 1 ”, “elementary course 2 ”, “intermediate course 1 ” and “intermediate course 2 ”). The sampled pupils were tested at their entry into primary school and were then followed for 5 to 6 years. They were tested again at the beginning of the 3rd grade of primary school, whether they reached that grade in 1999 or in 2000, i.e. whether they did not repeat any grade between the first and the third, or they repeated either the first or the second. Test 2 yielded two separate scores, one measuring numeracy (math) and the other measuring literacy (proficiency in the French language). Finally, pupils were tested again, spearately for math and literacy, soon after the end of primary school, i.e. when they entered middle school (in their “6th grade”). Pupils who did not repeat a grade in primary school were tested in 2002 whereas those who repeated once in primary school were tested in 2003. The variables available in the dataset are detailed in the appendix.*
 
 
 ######**Questions**
-**(a) Compare the distributions of raw test scores for each test. Comment. (1 point)**
-The global test score taken at the start of CP (preparatory course) is used as a baseline raw
-test score to measure the relative progress of a student as she goes from CP to CE2
-(elementary course). In order to compare the distributions of all 3 tests, we can analyse the
-graphs of the three global test scores.
+
+**Question (1a) Compare the distributions of raw test scores for each test. Comment. (1 point)**
+
+The global test score taken at the start of CP (preparatory course) is used as a baseline raw test score to measure the relative progress of a student as she goes from CP to CE2 (elementary course). In order to compare the distributions of all 3 tests, we can analyse the graphs of the three global test scores.
 
 ```{r, include=FALSE, warning=FALSE}
 
@@ -95,7 +94,7 @@ compared to each other. Through the description we can see that Test 1 is very d
 *Do all the sampled schools have similar teaching methods, teaching quality and access to pedagogical resources?
 
 
-**(b) How many missing values are there for each test score? Is this a problem if you want to study pupils’ trajectories or progress? (0.5 point)**
+** Question (1b) How many missing values are there for each test score? Is this a problem if you want to study pupils’ trajectories or progress? (0.5 point)**
 
 
 ```{r, include=FALSE, warning=FALSE}
@@ -124,8 +123,8 @@ save_kable("Transition Matrix for NA Values.pdf")
 As mentioned above, the number of NA values are 110, 1978 and 2163 for Test 1, Test 2
 and Test 3 respectively. We know that missing data could be at random or could be not at random. If it is at random then there isn’t a statistical issue at hand. To test the randomness of NA values we need to check whether there is a relationship between NAs and the deciles of raw scores. It is possible that being in a lower decile for one test could increase the chances of a student to drop-out of school by the time the next test is conducted. We can compute a transition matrix for this analysis. The 11th column of the transition matrix is for the missing values. We can see that based on the a student’s decile in Test 1 the chances of missing values in Test 2 falls as we go up in the deciles. This suggests that if a pupil performs poorly in a test, the chances of that student dropping-out in the next test is high and thus the missing data provides vital information of discouraged poor performers. In such a situation, missing values would be important to chart out a pupil’s trajectory who has not done well on the previous test.
 
-**(c) Plot the global score after 3 years against the entry score. Can you find a more meaningful way to present this information? (0.5 point)**
 
+**Question (1c) Plot the global score after 3 years against the entry score. Can you find a more meaningful way to present this information? (0.5 point)**
 
 ```{r, include=FALSE, warning=FALSE}
 
@@ -146,14 +145,13 @@ Cor12 <- cor(df1$gscore_t1, df1$gscore_t2, use="complete.obs")
 The fitted blue line is displays the relationship of perfect correlation between Test 1 and Test 2. The actual fitted line is displayed by the red line. The regression line shows a positive relationship between Test 1 and Test 2 global scores. While comparing the two lines we can see that the actual regression line is above the perfect blue line for the lower quartile and below the blue line for the higher quartile. At first glance it seems like the lower quartile improves their test scores at a better rate than the higher quartile. However, we know that the number of missing data increases significantly from Test 1 to Test 2. We also know that the missing data appears non-random, since the chances of drop-out of a lower decile students is high. This causes distortions in the data for Test 2. So, it is difficult to make any definite inferences on the relationship between the two test scores by simply looking at this graph. Alternatively we could depict the relationship between the test scores through the correlation coefficients.
 
 
-**(d) Analyzing “progress” (2 points)**
-**(i) With the variables at hand, how would you measure a pupil’s progress between the first and the third year of primary school? Between the third year and the final year of primary school?**
+**Question (1d) Analyzing “progress” (2 points)**
+**(d.i) With the variables at hand, how would you measure a pupil’s progress between the first and the third year of primary school? Between the third year and the final year of primary school?**
 
 In order to analyse progress of a particular student we could adopt either an absolute measure or a relative measure. In absolute terms we can look at the difference in her global raw scores across the three tests. In relative terms, we can look at in which decile of her class does she fall into across the three tests. However, as mentioned before, we are uncertain of the comparability of the three tests and the comparability of the students. For instance, we don’t know whether a particular test was harder than the previous one. In such a case, it would be better to adopt a relative measure of progress of pupil’s test scores.
 
 
-
-**(ii) Implement the strategy you suggest and provide a summary of the distributions of the variables you computed.**
+**(d.ii) Implement the strategy you suggest and provide a summary of the distributions of the variables you computed.**
 
 ``` {r, include=FALSE, warning=FALSE}
 ###1d) Analyzing progress through Z-Scores 
@@ -180,6 +178,7 @@ To measure the relative progress of a student we can compute standardized z-scor
 each test. The Z-Score from a normal distribution will tell us how far an individual raw test
 score is from the mean test score.
 $$𝑍_{i} = X_{i} − \overline{X}/sd𝑋_{i}$$
+
 : **Summary Statistics for Z-Scores of Test 1** 
 
 | Min | 1st Quart| Median | Mean | 3rd Quart  | Max |NAs|
@@ -218,7 +217,7 @@ $$𝑍_{i} = X_{i} − \overline{X}/sd𝑋_{i}$$
 * As discussed before, We can not make any conclusive statements on the performance of the weak and strong students due to the significant rise in missing values from Test 1 to Test 2 to Test 3. However, it is worth finding out the cause for weak students not being able to improve their performances across the tests. This could point towards structural problems in the schooling system that doesn't improve numeric and literal skills of weaker students. 
 
 
-**(e) Mobility between two successive tests. Focus on test scores expressed in deciles (they are stored under variables prefixed by “d ” in the dataset). The point of this question is to compute transition matrices between variables present in your dataset. Each cell pi,j of the 10x10 transition matrix between test A and test B represents the probability (as estimated by the realized share of students) that a student will be in decile j on test B, conditional on her score being in decile i on test A.Compute transition matrices across deciles of the global score distribution between test 1 and test 2, then between test 2 and test 3. Comment.(1 point)**
+**Question (1e) Mobility between two successive tests. Focus on test scores expressed in deciles (they are stored under variables prefixed by “d ” in the dataset). The point of this question is to compute transition matrices between variables present in your dataset. Each cell pi,j of the 10x10 transition matrix between test A and test B represents the probability (as estimated by the realized share of students) that a student will be in decile j on test B, conditional on her score being in decile i on test A.Compute transition matrices across deciles of the global score distribution between test 1 and test 2, then between test 2 and test 3. Comment.(1 point)**
 
 To compute transition matrices, the crosstab function in R is used and then converted into a dataset. A transition matrix tells us the probability of a student trasitioning from one decile to an other, given the student's decile for the previous test. 
 
@@ -270,12 +269,10 @@ The transition matrix of Test 2 to Test 3 shows greater rigidity in the movement
 The trends of the first 5 deciles in the first transition matrix, coupled with the immobility of the deciles in the second transition matrix are particularly worrying. They could point towards an education system that is failing to improve the performance of those students who struggle to score well. A consistent drop in performance could push students further into a discouraged state of mind which could in-turn affect their academic performances. If this poor performance gets solidified it could further perpetuate a feeling of low self-esteem and helplessness thus leading to a vicious cycle. 
 
 
+**Question (1f) In France, children are supposed to start primary school the year they turn six. Hence a school cohort typically includes pupils born between January 1st and December 31st of a given year.**
 
+**(f.i) Compare the global test scores of pupils born in January vs. those born in December on each of the three tests (“gscore t1”, “gscore t2”, “gscore t3”) and provide the 95% confidence interval for the difference between test scores. Interpret your findings. (2 points)**
 
-**(f) In France, children are supposed to start primary school the year they turn six. Hence a school cohort typically includes pupils born between January 1st and December 31st of a given year.**
-
-
-**(i) Compare the global test scores of pupils born in January vs. those born in December on each of the three tests (“gscore t1”, “gscore t2”, “gscore t3”) and provide the 95% confidence interval for the difference between test scores. Interpret your findings. (2 points)**
 
 : Comparison of Global Test Scores for January and December born children
 
@@ -340,7 +337,7 @@ table <- rbind(jan,dec,dif,ci)
 ```
 
 
-**(ii) Compare the evolution of the January vs. December global test score gap in the different years with the evolution of the global test score gap between children of executives/professionals and children of blue-collars (use the “parent occ” variable), with the 95% confidence interval for that gap. Interpret your results. (2 points)**
+**(f.ii) Compare the evolution of the January vs. December global test score gap in the different years with the evolution of the global test score gap between children of executives/professionals and children of blue-collars (use the “parent occ” variable), with the 95% confidence interval for that gap. Interpret your results. (2 points)**
 
 ```{r, include=FALSE, warning=FALSE}
 #Test scores of children of executives/professionals (parent_occ=3):
@@ -402,17 +399,20 @@ table2 <- rbind(pro,bc,dif2,ci2)
 
 The difference between test scores for pupils born in January and December is statistically significant at the 5% level of significance. On average, we see that for test 1, if a child was born in December it is likely that she will have meant 7.5 points less than the children born in January. However, we must bear in mind that the confidence interval do overlap, thus making it hard to draw any solid conclusions on this trend. A reason for this difference in test scores could be that the elementary school year begins in September for all 6 year olds. There is literature to prove that older children perform better on academic tests thus giving the January born children a sort of advantage in terms of cognitive and social maturity over the December born children. 
 
-**(iii) Why is the comparison of test scores of children born in January vs. December likely to underestimate the true effect of relative age differences on test scores? (1 point) (Hint: think of the dates at which each pupil took the different tests.)**
+**(f.iii) Why is the comparison of test scores of children born in January vs. December likely to underestimate the true effect of relative age differences on test scores? (1 point) (Hint: think of the dates at which each pupil took the different tests.)**
 
 In France, the compulsory age to start primary school is 6 year. In reality, parents decide to put a child in a year below or above depending on whether she was born in January or December. This is done to avoid a situation wherein the child is the oldest or the youngest in class since parents would prefer their children compete in a class with similar levels of cognition. We are also aware of the fact that some children could repeat a year of school. These two factors could distort our data and cause an underestimation of the differences of test scores based on age.  
 
 
 
-#####**Exercise II. Education in OECD Countries : **
+\newpage
+
+
+# **Exercise II. Education in OECD Countries :**
 
 *The dataset “pisa 2012.dta” is an excerpt from the 2012 wave of the Programme for International Student Assessment (PISA) survey for some OECD and non-OECD countries (namely Norway, Finland, France and Vietnam). PISA is a survey developed by the Organisation for Economic Co-operation and Development (OECD). Implemented on a triennial basis, it aims at collecting school performance data on youth at age 15 in about 65 countries worldwide. Tests are administered to pupils at school, in three different topics: maths, reading and science. Additional survey data collects information on pupil, parent and school characteristics. The PISA tests are meant to assess pupils’ skills rather than academic achievement. The test as a whole comprises 13 booklets (a booklet is a set of questions), among which 7 for mathematics, 3 for reading and 3 for science. Each pupil is administered 4 booklets out of the 13; thus, no pupil is supposed to answer all questions of all booklets. Each pupil’s overall skill level in mathematics, reading and science, is represented by 5 “plausible values” for each. Each plausible value is the result of an estimation procedure of a predictive model based on how pupils answered to their tests. The model used by the OECD is derived from the Rasch model, and basically relates a set of items to a person’s skills, where each person’s answer to each item can be “valued”, i.e. deemed correct or not.1 This means that generally speaking, to estimate models or simple descriptive statistics on overall skill data, you must run the same estimation 5 times, on each plausible value, and then work your way through from these 5 “plausible” results to the final one: For instance, a “final” average mean will be the mean of the five plausible mean values (computed each on a different plausible value variable). Similarly, the standard error of such mean will be the square root of a sum of two elements: [mean sampling variance, i.e. the mean of the 5 variances (one for each mean computed on a plausible value variable)] + 1.2 [“imputation” variance, or “measurement error” variance, which is equal to 1/4 of the sum of squared differences between the final mean and each of 5 “plausible” means]. More details are available in the PISA Data Analysis Manual.The 2012 PISA survey’s focus was on mathematics. Accordingly, not only did more of the test questions deal with mathematics than with other domains, but the pupil-level survey also included longer sections on subjective assessment from the pupil’s part on different mathematics-related topics. Among those, you’ll find questions on how the pupil considers her own performance and capabilities in mathematics, but also questions on how motivated the pupil is, etc. The information contained in a pupil’s answers to these questions is summed up in a few aggregate indices. These “subjective” questions are asked according to a rotating pattern: each student is asked to answer two randomly-chosen thirds of the questionnaire. This means that missing values for the “indices” variables in your database (i.e., for instance, INSTMOT, SCMAT, ANXMAT, FAILMAT, MATBEH, MATHEFF, MATINTFC) are a feature of the survey design, and can be considered random. The PISA survey data works with Balanced Repeated Replication weights. This is a technique which aims at estimating sampling variances of statistics obtained through stratified sampling. The basic idea is that your statistical software is going to replicate each command 80 times, each with a different set of pre-determined weights (variables W FSTR1 to W FSTR80 in your dataset), and that these 80 replications allow you to compute variances and standard errors.*
 
-**2.1)How many missing values do the plausible values for maths, reading and science have? What else can you say about missing values in this dataset? (2 points)**
+**Question 2.1) How many missing values do the plausible values for maths, reading and science have? What else can you say about missing values in this dataset? (2 points)**
 
 ```{r, include=FALSE, warning=FALSE}
 
@@ -438,7 +438,7 @@ unclass(pisa_2012$GENDER)
 #VNM = 4959 rows
 #FRA = 4613 rows
 
-#2.1) Calculate missing values for all plausible values
+# Calculate missing values for all plausible values
 sum(is.na(pisa_2012$PV1MATH)) # 0 NAs
 sum(is.na(pisa_2012$PV2MATH))# 0 NAs
 sum(is.na(pisa_2012$PV3MATH))# 0 NAs
@@ -458,7 +458,7 @@ sum(is.na(pisa_2012$PV5READ))# 0 NAs
 There are no missing values for any of the plausible values for maths, reading and science as the PISA computes plausible values based on prediction models which allows for non-responses to be coded. However, there are missing values for indices values which as specified in the manual, are missing by design and are thus random.  Further, the PISA data manual states that missing data is divided into 4 categories namely, item level non-response, multiple or invalid response, not administered response and not reached responses. These four categories of missing values are given specific codes and accordingly represented in the data set. It is also stated that contextual variables usually have missing data which leads to biased results. However, since only 2 of 3 variables of the data were missing, the bias was considered negligible. The above discussion requires more in depth analysis in order to understand the complexity of accounting for missing values in the data set. 
 
 
-**2.2)Run the "functions pisa" file. Describe each step of the function fun.pv(), and explain in your own words the underlying idea of the estimation procedure.** 
+**QUestion 2.2)Run the "functions pisa" file. Describe each step of the function fun.pv(), and explain in your own words the underlying idea of the estimation procedure.** 
 
 We can describe the steps of the function fun.pv() in the following way:
 
@@ -486,17 +486,17 @@ of the 80 mean estimates found in the first step and the mean estimate of PV.mea
 * **Step 10** : The function result() specifies what the outputs are. It consists of a data frame with fie columns and each
 column contains the variables computed above. Freq is the number of observations for the plausible values and Mean is the mean of those fie values, while s.e. is their standard error. LB and UB are the lower and upper bound of the confidence interval at the 95% confidence interval. For simplicity, the results are rounded to two decimal places.
 
-
 The overall idea of the function is to compute plausible values for each subject using the method of replication and the weights from the Balanced Repeated Replication (BRR) adjusted with the Fay factor. We have 5 plausible values which are then averaged using the final weight to get the average plausible value for a given subject.
 
 
-**2.2)** *For each country in the dataset, compute the country-level average scores in mathematics,reading and science. Can you rank countries in a meaningful way? What could explain differences between countries?*
+
+**Question 2.2) For each country in the dataset, compute the country-level average scores in mathematics,reading and science. Can you rank countries in a meaningful way? What could explain differences between countries?**
 
 
 ```{r, include=FALSE, warning=FALSE}
 
 
-#2.2) Country Comparison 
+# Country Comparison 
 
 ### See the functions_pisa.R script for details on the function "fun.pv" 
 
@@ -561,7 +561,10 @@ Matters get more complicated if we attempt to do a cross-country analysis of the
 
 Indeed, compulsory school ages are 6-16 for Norway, 6-16 for Finland though the recommended age is 7 years, 6-16 for France but around a vast majority of kids start school by 3 years, for Vietnam only 5 years of schooling is compulsory. Additionally, according to World Bank data, the share of government expenditure on education as percentage of total GDP was 5.5% in France (2017), 6.4% in Finland (2017), 7.91% in Norway (2017) and 4.2% in Vietnam (2018). These figures indicate that countries are vastly different in a myriad of ways which impact the way its students learn and grasp concepts. Thus, we can not rank countries based merely on the average test scores.  
 
-**2.3)** *Using the same methodology as in question 2, compute the average scores in reading, mathematics,and science for girls and boys separately. Comment.* 
+
+
+**Question 2.3) Using the same methodology as in question 2, compute the average scores in reading, mathematics,and science for girls and boys separately. Comment.**
+
 
 ```{r, include=FALSE, warning=FALSE}
 #Question 2.3
@@ -602,7 +605,8 @@ group_rows("Girls",3,4)
 
 Here we are analysing the mean of the means of the different scores for 15 year old girls and boys. According to the above table, boys perform slightly better than girls in math, worse than girls in reading and slightly worse than girls in science. There is a lively debate on the relationship of the sex of a child and their performance in academic tests. The stereotype is that boys do better in math tests and girls do better in reading tests. However, there is robust literature to argue that test scores are actually significantly affected by social conditioning. Indeed, the four countries we are studying have relatively higher gender parity than other countries and thus we see such a small difference in test scores for math. This implies that performance on tests are not dependent on intrinsic biological factors but by societal norms and attitudes. 
 
-**2.4)** *Are differences between girls and boys the same across countries? Find a meaningful, clear and complete way to represent your results, and comment.*
+
+**Question 2.4) Are differences between girls and boys the same across countries? Find a meaningful, clear and complete way to represent your results, and comment.**
 
 
 ```{r, include=FALSE, warning=FALSE}
@@ -698,10 +702,9 @@ Interpretation of the graphs :
 
 The above results indicate that the structure of the education system in Finland has significant gender differences. Indeed, it is noted that the cultural norms in Finland are such that girls are provided greater positive reinforcement for academic learning while boys are expected to perform more vocational tasks. This difference in social attitudes results in a majority of girls choosing general upper secondary school and a majority of boys choosing vocational education and training. It is important for the schooling system of a region to take into account the prevailing gender stereotypes in its society and take measures so as to not perpetuate them in the school environment. 
 
-**2.5)** *Have a look at the indices of self-assessment in mathematics. Compare boys and girls along these variables and across countries3. Describe each step of the function fun, and explain in your own words the underlying idea of the estimation procedure. Comment.*
+**Question 2.5)Have a look at the indices of self-assessment in mathematics. Compare boys and girls along these variables and across countries3. Describe each step of the function fun, and explain in your own words the underlying idea of the estimation procedure. Comment.**
 
 ```{r, include=FALSE, warning=FALSE}
-#Question 2.5
 
 ###Indicators of Self Assessment in Mathematics : 
 
@@ -859,12 +862,10 @@ The function is used to compute the average values of three indices of self-asse
 |       | [-0.31,-0.24] | [-0.13,-0.05] |
 
 
-Analysis of Math Anxiety : Here we observe that children from Finland, regardless of their sex, are the least anxious about math while children in France and Vietnam are more anxious. In norway we see a significant gender difference with girls being anxious while boys not being anxious about math. On average, girls appear to be more anxious than boys when it comes to math. 
-Analysis of Attribution of failure in Math : Here we observe that girls have higher values than boys, implying that they have a stronger belief that they will fail in math and they are more likely to attribute this failure to their internal skills. In Finland, students appear quite confident and do not perceive themselves as failing in math. 
+* Analysis of Math Anxiety : Here we observe that children from Finland, regardless of their sex, are the least anxious about math while children in France and Vietnam are more anxious. In norway we see a significant gender difference with girls being anxious while boys not being anxious about math. On average, girls appear to be more anxious than boys when it comes to math. 
 
-Analysis of Self-Assessment in Math : The gender differences are significant below the threshold of 5% significance level. On average, girls tend to have a more negative self-perception of their mathematical abilities than boys. Boys from Finland have the highest self-assessment of their math skills while it is interesting to note that Vietnamese boys have a negative self-perception. This could hint that Vietnam might have similar cultural norms as other Asian countries such as China, Singapore, India where the boys have immense social pressure to excel in academics and ultimately get prestigious high paying jobs to provide for the family.  
+* Analysis of Attribution of failure in Math : Here we observe that girls have higher values than boys, implying that they have a stronger belief that they will fail in math and they are more likely to attribute this failure to their internal skills. In Finland, students appear quite confident and do not perceive themselves as failing in math. 
 
-To conclude, we know that what a student learns in class is not solely dependent on the content of the lessons and the teaching methodology. Individual behavioral and general societal conditions and attitudes greatly impact a student's ability to learn effectively in a classroom.Thus, while financial resources, capital and effective teacher training are important aspects of an education policy, more subtle variables like gender disparities, socio-economic inequalities, self-confidence and mental health should not be ignored. 
+* Analysis of Self-Assessment in Math : The gender differences are significant below the threshold of 5% significance level. On average, girls tend to have a more negative self-perception of their mathematical abilities than boys. Boys from Finland have the highest self-assessment of their math skills while it is interesting to note that Vietnamese boys have a negative self-perception. This could hint that Vietnam might have similar cultural norms as other Asian countries such as China, Singapore, India where the boys have immense social pressure to excel in academics and ultimately get prestigious high paying jobs to provide for the family.  
 
-
-### Appendix : 
+To conclude, we know that what a student learns in class is not solely dependent on the content of the lessons and the teaching methodology. Individual behavioral and general societal conditions and attitudes greatly impact a student's ability to learn effectively in a classroom.Thus, while financial resources, capital and effective teacher training are important aspects of an education policy, more subtle variables like gender disparities, socio-economic inequalities, self-confidence and mental health should not be ignored.  
