@@ -13,13 +13,13 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-####Analyzing the French Labour Force : 
+# Analyzing the French Labour Force : 
 
 *The data lfshwk fr11.dta and lfshwk fr12.dta are excerpts from the 2011 and 2012 French Labor Force Survey (LFS). It covers the population of people, aged 15 years or more, living in households in metropolitan France in 2011 and 2012. The LFS has over 100 variables of which only a subset is required for this homework. The Annex presents the list of variables used for this homework and and their description. Furthermore, binary and categorial variables are labelled. This means that to each value of a given variable is attached its corresponding label. Hence the variable sexe has two values 1 and 2 which are respectively labelled “1.Male” and “2.Female”. Also note that some variables are numbers that are stored in string format. The main weight variable to be used for your computations is called weight. It is an individual weight and gives the number of persons living in France that each person interviewed represents. Individuals who refused to participate to the survey were given 0 as weight. The goal of this homework is to think about the definitions, measurement and concrete implementation of two concepts: the labor force and unemployment.*
 
 **Questions :**
 
-**1) Recall the concepts of employment, unemployment and inactivity. Base yourself on the recommendations of the International Labour Organization, and especially the resolutions of the 13th Conference of Labour Statisticians. Define the labor force participation rate, and the unemployment rate. (1 point)**
+**Question 1) Recall the concepts of employment, unemployment and inactivity. Base yourself on the recommendations of the International Labour Organization, and especially the resolutions of the 13th Conference of Labour Statisticians. Define the labor force participation rate, and the unemployment rate. (1 point)**
 
 *Defining Concepts of Labour Force* 
 
@@ -56,8 +56,8 @@ The unemployment rate is measured as the number of unemployed persons as a perce
 
 $$UR = (\frac{total no. of persons unemployed}{total labour force}) * 100$$
 
-**2)  In light of the definitions of the International Labor Organization and the INSEE, compute what you think are the “official”employment rate (employment-to-population rate) and unemployment rate in France in 2011 and 2012. Explain your computations. (4 pts)**
 
+**Question 2)  In light of the definitions of the International Labor Organization and the INSEE, compute what you think are the “official”employment rate (employment-to-population rate) and unemployment rate in France in 2011 and 2012. Explain your computations. (4 pts)**
 
 *Computing Employment & Unemployment Rates*
 
@@ -74,9 +74,7 @@ View(df11)
 df12 <- read_dta("C:/Users/Shreya/Downloads/lfshwk_fr12.dta")
 View(df12)
 
-
-
-#Question 2 : calculate official employment and unemployment rates in France 
+#calculate official employment and unemployment rates in France 
 
 #We are fixing the working-age population as all those who are 15 years and above :
 summary(df$ag) #the min age is already 15 and max age is 99. no need to subset the data.
@@ -116,7 +114,6 @@ While computing indicators related to the labour market, it is vital to avoid do
 - Step 3 : Calculate the Economically Inactive 
 
 *The hierarchy is : Employment > Unemployment > Inactive* 
-
 
 * Step 1 : Employment to Population Rate 
 According to the ILO, the official employment to population ratio is defined as that proportion of a country’s working-age population that is employed. The definition of employment remains the same as that provided in answer 1. 
@@ -165,7 +162,7 @@ In Table 1 and Table 2 we can see a rise in unemployment rate from approx 8.49% 
 * Step 3 : Economically Inactive
 The remaining share of the working-age population is deemed economically inactive. 
 
-**3) Discuss this definition of unemployment and offer your own definition, by emphasizing what seems to be more relevant. Note: Be concise. Your answer should contain less than 400 words. (3 pts)**
+**Question 3) Discuss this definition of unemployment and offer your own definition, by emphasizing what seems to be more relevant. Note: Be concise. Your answer should contain less than 400 words. (3 pts)**
 
 There are three verticals through which the definition of unemployment can be further enhanced.
 
@@ -204,7 +201,7 @@ Adding two more types of unemployment to the existing definition:
 This results in an enormous unemployment rate which is much larger than the previous unemployment rate. It is possible that I must add more caveats to make the rate better defined and usable. 
 
 
-**4) Assume that the LFS sample was drawn randomly (you can thus forget about weights for this question). What is the standard error of the estimated unemployment rate (computed in question b)? Comment. (3 points)**
+**Question 4) Assume that the LFS sample was drawn randomly (you can thus forget about weights for this question). What is the standard error of the estimated unemployment rate (computed in question b)? Comment. (3 points)**
 
 The standard error of an estimate measures how far the average sample estimate from the true average population estimate. It gives us the accuracy of the sample statistic. 
 
@@ -235,14 +232,14 @@ summary(unempl_unw_2012) #s.e. 0.0005815
 Table 3 and Table 4 show us that the standard error for the estimated unweighted unemployment rate is 0.001 which is indeed very low. This gives us confidence that the estimated unemployment rate is representative of the true population unemployment rate. 
 
 
-**5) Using both the lfshwk fr12.dta and lfshwk fr11.dta datasets, analyze the evolution of the structure of  the working-age population in terms of work status (employment, unemployment, inactivity):**
+**Question 5) Using both the lfshwk fr12.dta and lfshwk fr11.dta datasets, analyze the evolution of the structure of  the working-age population in terms of work status (employment, unemployment, inactivity):**
 **- between quarter 1, 2011 and quarter 2, 2011**
 **- between quarter 2, 2011 and quarter 3, 2011**
 **- between quarter 1, 2012 and quarter 2, 2012**
 **Comment. (4 pts)**
 
 ```{r, include = FALSE}
-# Question 5 : Looking at evolution of Working Age Population :
+# Looking at evolution of Working Age Population :
 
 # We already have unemplpoyment and employment figures. Need to create variable that captures inactivity. 
 
@@ -332,7 +329,7 @@ inact_q2_2012 <- lm(df12$inact[df12$q2==1]~1, weights = df12$weight[df12$q2==1])
 + In 2012 one again we can see a stable rate of the economically inactive population. This could indicate a need for policy interventions to study whether there is a sizable discouraged worker effect. 
 
 
-**6) Using the official definition of unemployment rate and labor force participation, comment on the differences that you are able to observe for this rate in 2012 by gender, age and highest qualification held. (5 pts) Note: Be concise. Your answer should contain less than 500 words.**
+**Question 6) Using the official definition of unemployment rate and labor force participation, comment on the differences that you are able to observe for this rate in 2012 by gender, age and highest qualification held. (5 pts) Note: Be concise. Your answer should contain less than 500 words.**
 
 
 ```{r, include=FALSE}
@@ -457,30 +454,13 @@ The highly educated account for a larger share of the labour force than the less
 + Age 
 Unsurprisingly, we see that the highest labour force participation rate is for the middle-age followed by the young and then the old. It is note-worthy that the share of the old-age labour force is quite significant and should not be discounted in calculations of the working-age population. This could mean that we are moving towards an economy in which people work for more number of years and more people work in their senior years. 
 
-### Appendix 
-```{r, ref.label=knitr::all_labels(),echo=TRUE,eval=FALSE}
-```
-
 
 # References
 
 @misc{insee_2022, title={Enqu?te emploi en continu EEC}, url={https://www.insee.fr/fr/metadonnees/source/serie/s1223}, journal={Insee}, year={2022}} 
- 
-  @misc{insee, title={France, Portrait Social?dition 2019}, url={https://www.insee.fr/fr/statistiques/4238387?sommaire=4238781#documentation}, journal={Insee}} 
-  
-   @misc{dixte_do_minni_rebi?re_rey_(insee)_sophie de waroquier de puel parlan (insee)_2019, title={Emploi, ch?mage et population active en 2018}, url={https://dares.travail-emploi.gouv.fr/publications/emploi-chomage-et-population-active-en-2018}, journal={Dares}, author={Dixte, Christophe and Do, Thi-Phuong-Thuy and Minni, Claude and Rebi?re, Simon and Rey, Marie and (Insee), Christelle De Miras and Sophie De Waroquier de Puel Parlan (Insee)}, year={2019}, month={Jul}} 
-   
-    @misc{international training compendium on labour statistics_2013, url={https://www.ilo.org/global/statistics-and-databases/WCMS_210299/lang--en/index.htm}, journal={International training compendium on labour statistics}, year={2013}, month={Apr}} 
-    
-@MISC{ilostat,
-  title        = "{ILOSTAT} data tools to find and download labour statistics",
-  booktitle    = "{ILOSTAT}",
-  abstract     = "Get labour statistics from our comprehensive database with a
-                  tool that works for you. All tools provide free and open
-                  access to our data.",
-  howpublished = "\url{https://ilostat.ilo.org/data/.}",
-  note         = "Accessed: 2022-6-16",
-  language     = "en"
-}
+@misc{insee, title={France, Portrait Social?dition 2019}, url={https://www.insee.fr/fr/statistiques/4238387?sommaire=4238781#documentation}, journal={Insee}} 
+@misc{dixte_do_minni_rebi?re_rey_(insee)_sophie de waroquier de puel parlan (insee)_2019, title={Emploi, ch?mage et population active en 2018}, url={https://dares.travail-emploi.gouv.fr/publications/emploi-chomage-et-population-active-en-2018}, journal={Dares}, author={Dixte, Christophe and Do, Thi-Phuong-Thuy and Minni, Claude and Rebi?re, Simon and Rey, Marie and (Insee), Christelle De Miras and Sophie De Waroquier de Puel Parlan (Insee)}, year={2019}, month={Jul}} 
+@misc{international training compendium on labour statistics_2013, url={https://www.ilo.org/global/statistics-and-databases/WCMS_210299/lang--en/index.htm}, journal={International training compendium on labour statistics}, year={2013}, month={Apr}} 
+@misc{ilostat, title = "{ILOSTAT} data tools to find and download labour statistics", booktitle = "{ILOSTAT}", abstract = "Get labour statistics from our comprehensive database with a tool that works for you. All tools provide free and open access to our data.", howpublished = "\url{https://ilostat.ilo.org/data/.}", note = "Accessed: 2022-6-16", language = "en"}
 
      
