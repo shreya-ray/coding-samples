@@ -1,5 +1,5 @@
 ---
-title: 'Measurement of Policy Outcomes HW5 : Labour'
+title: 'Measurement of Policy Outcomes HW5 : Paris School of Economics'
 author: "Shreya RAY"
 date: "16/11/2020"
 output:
