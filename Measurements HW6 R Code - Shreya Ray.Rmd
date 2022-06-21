@@ -1,5 +1,5 @@
 ---
-title: 'Econometrics Measurements Homework 6 : Paris School of Economics'
+title: 'Measurements of Policy Outcomes HW 6 : Paris School of Economics'
 author: "Shreya Ray"
 date: "30/11/2020"
 output:
